@@ -8,6 +8,7 @@ import { PERMISSIONS } from "@/lib/rbac/permissions";
 import { canManageRole } from "@/lib/rbac/roles";
 import { createUserSchema, updateUserSchema } from "@/lib/validation/schemas";
 import { clientIp } from "@/lib/services/audit.service";
+import { emailFromUsername } from "@/lib/constants/company";
 import type { Role } from "@/lib/repositories/types";
 
 function tempPassword() {
@@ -29,8 +30,8 @@ export async function POST(req: Request) {
 
   const admin = createAdminClient();
   const password = tempPassword();
-  const email = parsed.data.email.trim().toLowerCase();
-  const username = parsed.data.username.trim().toLowerCase();
+  const username = parsed.data.username; // already lowercased by the schema
+  const email = emailFromUsername(username);
   const { data, error } = await admin.auth.admin.createUser({
     email,
     password,
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
     })
     .catch(() => {});
 
-  return NextResponse.json({ ok: true, tempPassword: password });
+  return NextResponse.json({ ok: true, tempPassword: password, email, username });
 }
 
 export async function PATCH(req: Request) {

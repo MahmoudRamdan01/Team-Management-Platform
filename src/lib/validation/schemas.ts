@@ -3,7 +3,8 @@ import { z } from "zod";
 const USERNAME = z
   .string()
   .trim()
-  .regex(/^[a-z0-9_.-]{3,20}$/, "3–20 chars: a–z, 0–9, _ . -");
+  .regex(/^[A-Za-z0-9_.-]{3,20}$/, "3–20 chars: letters, numbers, _ . -")
+  .transform((v) => v.toLowerCase());
 
 const PASSWORD = z.string().min(8, "At least 8 characters");
 
@@ -21,7 +22,8 @@ const DEPT = z.enum([
 const ROLE = z.enum(["super_admin", "admin", "manager", "employee"]);
 
 export const loginSchema = z.object({
-  email: z.string().email(),
+  // username or full email — the route appends @airocean.com when there's no "@"
+  email: z.string().trim().min(1).max(120),
   password: z.string().min(1),
 });
 
@@ -29,7 +31,6 @@ export const registerSchema = z
   .object({
     fullName: z.string().trim().min(2).max(80),
     username: USERNAME,
-    email: z.string().email(),
     dept: DEPT,
     password: PASSWORD,
     confirm: z.string(),
@@ -63,7 +64,6 @@ export const updateUserSchema = z.object({
 export const createUserSchema = z.object({
   fullName: z.string().trim().min(2).max(80),
   username: USERNAME,
-  email: z.string().email(),
   dept: DEPT,
   role: ROLE.default("employee"),
 });

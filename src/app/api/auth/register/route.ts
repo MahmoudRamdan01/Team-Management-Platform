@@ -5,6 +5,7 @@ import { getRepositories } from "@/lib/repositories";
 import { registerSchema } from "@/lib/validation/schemas";
 import { rateLimit } from "@/lib/ratelimit";
 import { clientIp } from "@/lib/services/audit.service";
+import { emailFromUsername } from "@/lib/constants/company";
 
 export async function POST(req: Request) {
   const h = headers();
@@ -23,8 +24,8 @@ export async function POST(req: Request) {
   }
 
   const supabase = createClient();
-  const email = parsed.data.email.trim().toLowerCase();
-  const username = parsed.data.username.trim().toLowerCase();
+  const username = parsed.data.username; // already lowercased by the schema
+  const email = emailFromUsername(username);
 
   // Uniqueness pre-check for a friendlier error than the DB constraint.
   const existing = await getRepositories(supabase).users.getByUsername(username).catch(() => null);

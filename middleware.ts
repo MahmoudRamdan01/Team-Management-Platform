@@ -1,16 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
-import { isPublicPath, matchRouteGuard, ADMIN_ROLES } from "@/lib/rbac/routes";
+import { isPublicPath } from "@/lib/rbac/routes";
 
 /**
- * Layer 1 of defense in depth: refresh the session and apply COARSE route gates.
- * Authenticated-vs-public is enforced here; the admin section requires an admin
- * role. Fine-grained permission checks live in server components/route handlers,
- * with Postgres RLS as the final backstop.
+ * Layer 1 of defense in depth: refresh the session and redirect unauthenticated
+ * users. Fine-grained checks (incl. the admin section) live in server components/
+ * route handlers via requirePermission, with Postgres RLS as the final backstop —
+ * so we avoid an extra per-request DB round-trip here.
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const { response, user, supabase } = await updateSession(request);
+  const { response, user } = await updateSession(request);
 
   if (isPublicPath(pathname)) return response;
 
@@ -19,19 +19,6 @@ export async function middleware(request: NextRequest) {
     url.pathname = "/login";
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
-  }
-
-  const guard = matchRouteGuard(pathname);
-
-  // Admin section needs an admin role — resolve it once here.
-  if (guard && pathname.startsWith("/admin")) {
-    const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-    const role = (data as { role?: string } | null)?.role;
-    if (!role || !ADMIN_ROLES.includes(role as (typeof ADMIN_ROLES)[number])) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
-      return NextResponse.redirect(url);
-    }
   }
 
   return response;
