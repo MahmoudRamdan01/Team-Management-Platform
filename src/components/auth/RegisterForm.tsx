@@ -37,7 +37,7 @@ export function RegisterForm() {
         setInfo("تم إنشاء الحساب ✅ — افتح بريدك لتأكيد الحساب ثم سجّل الدخول.");
         return;
       }
-      router.replace("/dashboard");
+      router.replace("/home");
       router.refresh();
     } catch {
       setError("Network error. Please try again.");
