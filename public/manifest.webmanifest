@@ -1,0 +1,20 @@
+{
+  "name": "AOI Team Hub — Air Ocean Line",
+  "short_name": "AOI Team Hub",
+  "description": "Enterprise team management platform for Air Ocean Line.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C1722",
+  "theme_color": "#0C1722",
+  "dir": "auto",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/icons/aoi-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
