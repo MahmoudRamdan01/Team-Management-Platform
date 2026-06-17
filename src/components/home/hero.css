@@ -1,0 +1,160 @@
+/* ════════════════════════════════════════════════════════════
+   AOI Team Hub — animated home, ported from the original v1.4 hero.
+   All selectors scoped under .aoi-home so they never leak into the app.
+   ════════════════════════════════════════════════════════════ */
+
+.aoi-home {
+  --ink: #0c1722; --navy: #111e2c; --panel: #192634; --panel2: #22313f;
+  --line: rgba(178, 204, 230, 0.1); --line2: rgba(178, 204, 230, 0.2);
+  --foam: #f2f6fa; --mist: #94a7b8; --gold: #f7b733; --gold2: #e9a41c;
+  --gold-ink: #3a2a05; --gold-soft: rgba(247, 183, 51, 0.13);
+  --fin: #4fc3f7; --sls: #ff8e5e; --ops: #43d9a0; --cs: #b49cff;
+}
+
+/* reveal-on-scroll */
+.aoi-home .rv { opacity: 0; transform: translateY(20px); transition: opacity .7s cubic-bezier(.22,.8,.28,1), transform .7s cubic-bezier(.22,.8,.28,1); }
+.aoi-home .rv.in { opacity: 1; transform: none; }
+.aoi-home .d1 { transition-delay: .08s } .aoi-home .d2 { transition-delay: .16s }
+.aoi-home .d3 { transition-delay: .24s } .aoi-home .d4 { transition-delay: .32s }
+
+/* ── HERO ── */
+.aoi-home .hero {
+  position: relative; min-height: 76vh; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; border-radius: 22px; border: 1px solid var(--line2);
+}
+.aoi-home .hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.30) 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(255,255,255,.16) 1px, transparent 1.8px),
+    linear-gradient(180deg,#091320 0%,#0F2236 52%,#163450 76%,#1C405F 100%);
+  background-size: 260px 260px,420px 420px,100% 100%;
+  background-position: 0 0,130px 80px,0 0;
+}
+.aoi-home .sun {
+  position: absolute; z-index: 1; right: 9%; top: 30%; width: 460px; height: 460px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(247,183,51,.34) 0%, rgba(247,183,51,.10) 36%, transparent 64%);
+  pointer-events: none;
+}
+.aoi-home .hero-inner { position: relative; z-index: 5; text-align: center; padding: 70px 24px 22vh; max-width: 820px; }
+.aoi-home .hero-inner > * { animation: heroRise .7s cubic-bezier(.22,.8,.28,1) both; }
+.aoi-home .hero-inner > .eyebrow { animation-delay: .05s }
+.aoi-home .hero-inner > h1 { animation-delay: .15s }
+.aoi-home .hero-inner > .checks { animation-delay: .32s }
+.aoi-home .hero-inner > .sub { animation-delay: .42s }
+.aoi-home .hero-inner > .cta-row { animation-delay: .52s }
+@keyframes heroRise { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
+
+.aoi-home .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: .7rem; letter-spacing: .3em; color: var(--gold); text-transform: uppercase; margin-bottom: 20px; }
+.aoi-home .hero h1 { font-family: var(--font-comfortaa), 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(1.8rem,4.2vw,3.3rem); line-height: 1.18; letter-spacing: -.01em; }
+.aoi-home .hero h1 .g { color: var(--gold); }
+.aoi-home .checks { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; margin: 24px 0 6px; }
+.aoi-home .chk { display: flex; align-items: center; gap: 8px; font-family: var(--font-comfortaa),'Comfortaa'; font-weight: 700; font-size: .82rem; letter-spacing: .18em; color: var(--foam); }
+.aoi-home .chk svg { width: 18px; height: 18px; color: var(--gold); }
+.aoi-home .hero .sub { color: var(--mist); font-size: 1rem; max-width: 580px; margin: 14px auto 0; font-weight: 300; }
+.aoi-home .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
+
+.aoi-home .scroll-cue { position: absolute; z-index: 6; bottom: 16px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: .58rem; letter-spacing: .34em; color: var(--mist); animation: cue 2.4s ease-in-out infinite; }
+@keyframes cue { 0%,100% { transform: translate(-50%,0) } 50% { transform: translate(-50%,7px) } }
+
+/* ── Sea ── */
+.aoi-home .sea { position: absolute; left: 0; right: 0; bottom: 0; height: 34%; z-index: 2; pointer-events: none; overflow: hidden; }
+.aoi-home .wave { position: absolute; left: 0; width: 200%; animation: drift linear infinite; }
+@keyframes drift { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+.aoi-home .w1 { bottom: 40%; height: 62%; color: rgba(31,66,97,.40); animation-duration: 34s; }
+.aoi-home .w2 { bottom: 18%; height: 66%; color: rgba(20,48,73,.72); animation-duration: 22s; }
+.aoi-home .w3 { bottom: -2px; height: 60%; color: #12283c; animation-duration: 14s; }
+
+/* ── Shore + road ── */
+.aoi-home .shore { position: absolute; left: 0; bottom: 0; width: 46%; height: 27%; z-index: 3; pointer-events: none; }
+.aoi-home .shore svg { width: 100%; height: 100%; display: block; }
+.aoi-home .road-dash { position: absolute; left: 1%; bottom: 50%; width: 42%; height: 5px; border-radius: 3px; background: repeating-linear-gradient(90deg,var(--gold) 0 28px,transparent 28px 58px); opacity: .85; animation: laneFlow 1s linear infinite; }
+@keyframes laneFlow { from { background-position: 0 0 } to { background-position: -58px 0 } }
+
+/* ── Clouds ── */
+.aoi-home .cloud { position: absolute; z-index: 2; border-radius: 999px; background: rgba(226,238,250,.05); pointer-events: none; }
+.aoi-home .c1 { width: 140px; height: 22px; right: 14%; top: 24%; animation: cloudDrift 30s linear infinite; }
+.aoi-home .c2 { width: 90px; height: 16px; right: 30%; top: 40%; animation: cloudDrift 40s linear infinite reverse; }
+@keyframes cloudDrift { from { transform: translateX(24px) } to { transform: translateX(-34px) } }
+
+/* ── Journey: truck → ship → plane ── */
+.aoi-home .journey { position: absolute; inset: auto 0 0 0; height: 60%; z-index: 4; pointer-events: none; }
+.aoi-home .veh { position: absolute; width: clamp(140px,16vw,220px); filter: drop-shadow(0 14px 22px rgba(0,0,0,.45)); opacity: 0; }
+.aoi-home .veh-truck { bottom: 13%; animation: jrnTruck 18s ease-in-out infinite; }
+@keyframes jrnTruck {
+  0% { left: -20%; opacity: 0 } 3% { opacity: 1 } 7% { transform: translateY(0) }
+  10% { transform: translateY(-2px) } 13% { transform: translateY(0) }
+  23% { left: 18%; opacity: 1; transform: translateY(0) }
+  27% { left: 22%; opacity: 0; transform: translateY(5px) scale(.97) } 100% { left: 22%; opacity: 0 }
+}
+.aoi-home .veh-ship { bottom: 15%; animation: jrnShip 18s ease-in-out infinite; }
+@keyframes jrnShip {
+  0%,26% { left: 20%; opacity: 0 } 30% { opacity: 1 } 34% { transform: translateY(0) rotate(-.7deg) }
+  45% { transform: translateY(-9px) rotate(.8deg) } 55% { transform: translateY(0) rotate(-.7deg) }
+  60% { left: 60%; opacity: 1; transform: translateY(-3px) rotate(.4deg) }
+  64% { left: 64%; opacity: 0; transform: translateY(-12px) scale(.97) } 100% { left: 64%; opacity: 0 }
+}
+.aoi-home .veh-plane { bottom: 22%; width: clamp(160px,18vw,256px); animation: jrnPlane 18s ease-in-out infinite; }
+@keyframes jrnPlane {
+  0%,63% { left: 58%; bottom: 20%; opacity: 0; transform: rotate(-3deg) scale(.92) }
+  67% { opacity: 1 } 75% { bottom: 38%; transform: rotate(-8deg) scale(1.02) }
+  88% { bottom: 56%; opacity: 1; transform: rotate(-11deg) scale(1.08) }
+  100% { left: 128%; bottom: 76%; opacity: 0; transform: rotate(-13deg) scale(1.12) }
+}
+
+/* ── Stats bar ── */
+.aoi-home .statsbar { position: relative; z-index: 8; display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; max-width: 760px; margin: -48px auto 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--line); box-shadow: 0 22px 48px -20px rgba(0,0,0,.6); }
+.aoi-home .stat { background: linear-gradient(180deg,var(--panel2),var(--panel)); padding: 22px 16px; text-align: center; }
+.aoi-home .stat .num { font-family: var(--font-comfortaa),'Comfortaa'; font-weight: 700; font-size: 2rem; color: var(--gold); line-height: 1; }
+.aoi-home .stat .lbl { font-family: 'JetBrains Mono', monospace; font-size: .58rem; letter-spacing: .26em; color: var(--mist); margin-top: 9px; text-transform: uppercase; }
+
+/* ── Section headings ── */
+.aoi-home .secn { padding: 84px 0 12px; }
+.aoi-home .sec-head { text-align: center; max-width: 640px; margin: 0 auto 44px; }
+.aoi-home .sec-title { font-family: var(--font-comfortaa),'Comfortaa'; font-weight: 700; font-size: clamp(1.5rem,3vw,2.1rem); color: var(--gold); }
+.aoi-home .sec-u { display: block; width: 64px; height: 4px; border-radius: 99px; background: var(--gold); margin: 14px auto 16px; }
+.aoi-home .sec-sub { color: var(--mist); font-size: .96rem; }
+
+/* ── Department gates ── */
+.aoi-home .gates { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 18px; }
+.aoi-home .gate { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 28px 24px 22px; background: linear-gradient(165deg,var(--panel2) 0%,var(--panel) 70%); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; transition: transform .3s, border-color .3s, box-shadow .3s; }
+.aoi-home .gate::before { content: ''; position: absolute; inset: 0 auto auto 0; width: 100%; height: 3px; background: var(--c); opacity: .85; }
+.aoi-home .gate:hover { transform: translateY(-6px); border-color: color-mix(in srgb,var(--c) 45%,transparent); box-shadow: 0 26px 50px -22px color-mix(in srgb,var(--c) 38%,rgba(0,0,0,.7)); }
+.aoi-home .gate-ic { width: 52px; height: 52px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: var(--c); background: color-mix(in srgb,var(--c) 13%,transparent); border: 1px solid color-mix(in srgb,var(--c) 30%,transparent); }
+.aoi-home .gate-ic svg { width: 25px; height: 25px; }
+.aoi-home .gate h3 { font-family: var(--font-comfortaa),'Comfortaa'; font-weight: 600; font-size: 1.12rem; }
+.aoi-home .g-meta { font-family: 'JetBrains Mono', monospace; font-size: .6rem; letter-spacing: .2em; color: var(--c); }
+.aoi-home .g-blurb { color: var(--mist); font-size: .84rem; min-height: 42px; }
+.aoi-home .g-go { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); font-weight: 500; font-size: .8rem; color: var(--c); }
+.aoi-home .g-go svg { width: 15px; height: 15px; transition: transform .25s; }
+.aoi-home .gate:hover .g-go svg { transform: translateX(5px); }
+
+/* ── Flagship ── */
+.aoi-home .flag { position: relative; display: flex; gap: 30px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 34px 36px; border: 1px solid var(--line); border-radius: 22px; overflow: hidden; background: radial-gradient(620px 240px at 88% -20%, rgba(247,183,51,.14), transparent 60%), linear-gradient(165deg,var(--panel2),var(--panel)); box-shadow: 0 22px 48px -20px rgba(0,0,0,.6); }
+.aoi-home .flag::before { content: ''; position: absolute; inset: 0 auto auto 0; width: 100%; height: 3px; background: linear-gradient(90deg,var(--gold),transparent 70%); }
+.aoi-home .flag-l { flex: 1 1 420px; min-width: 0; }
+.aoi-home .flag-l h3 { font-family: var(--font-comfortaa),'Comfortaa'; font-weight: 700; font-size: 1.4rem; margin: 8px 0 10px; }
+.aoi-home .flag-l p { color: var(--mist); font-size: .92rem; max-width: 540px; }
+.aoi-home .flag-r { display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+.aoi-home .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.aoi-home .tag { font-family: 'JetBrains Mono', monospace; font-size: .6rem; letter-spacing: .14em; color: var(--mist); border: 1px solid var(--line2); border-radius: 999px; padding: 5px 11px; }
+.aoi-home .verchip { font-family: 'JetBrains Mono', monospace; font-size: .66rem; color: var(--gold); }
+
+/* ── CTA buttons (local to home) ── */
+.aoi-home .hbtn { display: inline-flex; align-items: center; gap: 9px; padding: 13px 26px; border-radius: 999px; font-weight: 600; font-size: .9rem; transition: transform .22s, box-shadow .22s, border-color .22s; }
+.aoi-home .hbtn svg { width: 16px; height: 16px; }
+.aoi-home .hbtn:hover { transform: translateY(-2px); }
+.aoi-home .hbtn-gold { background: linear-gradient(135deg,#FFD069 0%,var(--gold) 45%,var(--gold2) 100%); color: var(--gold-ink); box-shadow: 0 14px 30px -10px rgba(247,183,51,.55); }
+.aoi-home .hbtn-ghost { border: 1px solid var(--line2); color: var(--foam); background: rgba(255,255,255,.03); }
+.aoi-home .hbtn-ghost:hover { border-color: var(--gold); }
+
+@media (max-width: 640px) {
+  .aoi-home .hero-inner { padding-bottom: 26vh; }
+  .aoi-home .statsbar { margin-top: -36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aoi-home .veh-truck, .aoi-home .veh-plane { animation: none; opacity: 0; }
+  .aoi-home .veh-ship { animation: none; opacity: 1; left: 42%; bottom: 16%; }
+  .aoi-home .road-dash, .aoi-home .cloud, .aoi-home .wave, .aoi-home .scroll-cue { animation: none; }
+  .aoi-home .rv { opacity: 1; transform: none; }
+}

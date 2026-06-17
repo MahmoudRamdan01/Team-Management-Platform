@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Wrench, Users, EyeOff, ScrollText, Building2, X } from "lucide-react";
+import { Home, LayoutDashboard, Wrench, Users, EyeOff, ScrollText, Building2, X } from "lucide-react";
 import { AoiLogo } from "@/components/brand/AoiLogo";
 import { useAccess } from "@/lib/rbac/access-context";
 import { useI18n } from "@/lib/i18n/context";
@@ -17,6 +17,7 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
   const dept = DEPARTMENT_MAP[profile.dept];
 
   const main = [
+    { href: "/home", label: t("nav.home"), icon: Home, show: true },
     { href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard, show: true },
     { href: "/tools", label: t("nav.tools"), icon: Wrench, show: can(PERMISSIONS.TOOL_VIEW) },
     { href: `/departments/${profile.dept}`, label: locale === "ar" ? dept?.nameAr : dept?.nameEn, icon: Building2, show: true },
@@ -56,7 +57,7 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
         )}
       >
         <div className="flex items-center justify-between px-1">
-          <Link href="/dashboard" onClick={onClose}>
+          <Link href="/home" onClick={onClose}>
             <AoiLogo />
           </Link>
           <button className="text-mist md:hidden" onClick={onClose} aria-label="close">

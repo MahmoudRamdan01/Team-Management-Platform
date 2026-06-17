@@ -22,6 +22,7 @@
     "save": "Save and continue"
   },
   "nav": {
+    "home": "Home",
     "dashboard": "Dashboard",
     "tools": "Tools",
     "departments": "Departments",
@@ -67,6 +68,28 @@
     "status": "Status",
     "actions": "Actions",
     "save": "Save"
+  },
+  "home": {
+    "eyebrow": "AOI ▸ INTERNAL ▸ AUTOMATION HUB",
+    "title1": "Every tool your team needs.",
+    "title2": "One hub.",
+    "find": "FIND.",
+    "openw": "OPEN.",
+    "done": "DONE.",
+    "sub": "Finance, Sales, Operations and more for the Air Ocean Line team — quick to find, one click to open.",
+    "browse": "Browse tools",
+    "search": "Search tools",
+    "statDepts": "Departments",
+    "statTools": "Your tools",
+    "statLive": "Live now",
+    "pickDept": "Your departments",
+    "pickDeptSub": "Each gate opens the tools built for that team.",
+    "openDept": "Open department",
+    "flagship": "Flagship tool",
+    "flagshipSub": "The one doing the heavy lifting right now.",
+    "openTool": "Open tool",
+    "tools": "tools",
+    "live": "live"
   },
   "common": {
     "loading": "Loading…",

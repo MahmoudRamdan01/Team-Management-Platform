@@ -29,7 +29,7 @@ export function LoginForm() {
         setError(data.error ?? "Login failed.");
         return;
       }
-      router.replace(params.get("next") || "/dashboard");
+      router.replace(params.get("next") || "/home");
       router.refresh();
     } catch {
       setError("Network error. Please try again.");
