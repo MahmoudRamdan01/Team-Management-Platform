@@ -12,6 +12,7 @@ import type { Tool } from "@/lib/repositories/types";
 export function ToolLauncherFrame({ tool }: { tool: Tool }) {
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [src, setSrc] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string>("");
   const launched = useRef(false);
 
   useEffect(() => {
@@ -20,8 +21,13 @@ export function ToolLauncherFrame({ tool }: { tool: Tool }) {
 
     (async () => {
       try {
-        const res = await fetch(`/api/tools/${tool.id}/launch`, { method: "POST" });
+        const res = await fetch(`/api/tools/${tool.id}/launch`, {
+          method: "POST",
+          credentials: "same-origin",
+        });
         if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          setErrorMsg(`Launch failed (HTTP ${res.status}${body.reason ? ` · ${body.reason}` : ""}).`);
           setState("error");
           return;
         }
@@ -29,7 +35,8 @@ export function ToolLauncherFrame({ tool }: { tool: Tool }) {
         localStorage.setItem("AOI_SESSION_SHARED", JSON.stringify(data.session));
         setSrc(data.launchUrl);
         setState("ready");
-      } catch {
+      } catch (e) {
+        setErrorMsg(e instanceof Error ? e.message : "Network error.");
         setState("error");
       }
     })();
@@ -39,7 +46,8 @@ export function ToolLauncherFrame({ tool }: { tool: Tool }) {
     return (
       <div className="card grid place-items-center gap-3 p-12 text-center">
         <AlertTriangle className="text-[#FF8E5E]" />
-        <p className="text-mist">Could not launch this tool. You may not have access.</p>
+        <p className="text-foam">Could not launch this tool.</p>
+        {errorMsg && <p className="font-mono text-xs text-mist">{errorMsg}</p>}
       </div>
     );
   }

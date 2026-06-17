@@ -51,9 +51,12 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
       {mobileOpen && <div className="fixed inset-0 z-30 bg-black/50 md:hidden" onClick={onClose} />}
       <aside
         className={cn(
-          "fixed inset-y-0 z-40 flex w-64 flex-col border-e border-white/10 bg-navy/95 px-4 py-5 backdrop-blur transition-transform md:static md:translate-x-0",
+          // `md:!translate-x-0` must use !important: in RTL, `rtl:translate-x-full`
+          // has higher specificity than a plain `md:translate-x-0` and would keep
+          // the sidebar off-canvas on desktop.
+          "fixed inset-y-0 z-40 flex w-64 shrink-0 flex-col border-e border-white/10 bg-navy/95 px-4 py-5 backdrop-blur transition-transform md:static md:!translate-x-0",
           "ltr:left-0 rtl:right-0",
-          mobileOpen ? "translate-x-0" : "ltr:-translate-x-full rtl:translate-x-full md:translate-x-0"
+          mobileOpen ? "translate-x-0" : "ltr:-translate-x-full rtl:translate-x-full"
         )}
       >
         <div className="flex items-center justify-between px-1">
