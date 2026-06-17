@@ -64,7 +64,7 @@ export function ToolLauncherFrame({ tool }: { tool: Tool }) {
           title={tool.name}
           src={src}
           className="h-full w-full"
-          sandbox="allow-scripts allow-same-origin allow-downloads allow-forms allow-popups allow-modals"
+          allow="clipboard-read; clipboard-write"
         />
       )}
     </div>

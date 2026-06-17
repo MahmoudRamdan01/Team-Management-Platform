@@ -25,22 +25,26 @@ export async function POST(req: Request) {
   const supabase = createClient();
   const repos = getRepositories(supabase);
 
+  const email = parsed.data.email.trim().toLowerCase();
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: parsed.data.email,
+    email,
     password: parsed.data.password,
   });
 
   if (error || !data.user) {
     await repos.audit
-      .log({
-        actorUsername: parsed.data.email,
-        action: "login_failed",
-        metadata: { email: parsed.data.email },
-        ip,
-        userAgent: ua,
-      })
+      .log({ actorUsername: email, action: "login_failed", metadata: { email, code: error?.code }, ip, userAgent: ua })
       .catch(() => {});
-    return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+    const notConfirmed = error?.code === "email_not_confirmed" || /confirm/i.test(error?.message ?? "");
+    return NextResponse.json(
+      {
+        error: notConfirmed
+          ? "Your email isn't confirmed yet. Ask an admin, or disable email confirmation in Supabase."
+          : "Invalid email or password.",
+        code: error?.code,
+      },
+      { status: 401 }
+    );
   }
 
   const profile = await repos.users.getById(data.user.id).catch(() => null);

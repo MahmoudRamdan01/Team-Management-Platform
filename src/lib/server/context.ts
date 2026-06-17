@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getRepositories, type Repositories } from "@/lib/repositories";
@@ -15,12 +16,12 @@ export interface ServerContext {
 }
 
 /**
- * Resolves the full server-side context for the current request: the Supabase
- * user, their profile, the repository registry (scoped by the user's RLS) and
- * their effective permissions. The single entry point server components and
- * route handlers use to wire up the abstracted data layer.
+ * Resolves the full server-side context for the current request. Wrapped in
+ * React `cache()` so the layout and the page (and any nested server component)
+ * share ONE auth+profile fetch per request instead of repeating it — a major
+ * latency win on every navigation.
  */
-export async function getServerContext(): Promise<ServerContext> {
+export const getServerContext = cache(async (): Promise<ServerContext> => {
   const supabase = createClient();
   const {
     data: { user },
@@ -33,13 +34,18 @@ export async function getServerContext(): Promise<ServerContext> {
     return { user: null, profile: null, repos, access, permissions: new Set() };
   }
 
-  const profile = await repos.users.getById(user.id);
+  // Fetch profile + permission overrides in parallel.
+  const [profile, overrides] = await Promise.all([
+    repos.users.getById(user.id),
+    repos.users.getPermissionOverrides(user.id),
+  ]);
+
   const permissions = profile
-    ? computeEffectivePermissions(profile.role, await repos.users.getPermissionOverrides(profile.id))
+    ? computeEffectivePermissions(profile.role, overrides)
     : new Set<PermissionKey>();
 
   return { user: { id: user.id, email: user.email }, profile, repos, access, permissions };
-}
+});
 
 /** Require an authenticated user with a profile, else redirect to login. */
 export async function requireUser(): Promise<ServerContext & { profile: Profile }> {

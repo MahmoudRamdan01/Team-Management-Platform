@@ -29,11 +29,13 @@ export async function POST(req: Request) {
 
   const admin = createAdminClient();
   const password = tempPassword();
+  const email = parsed.data.email.trim().toLowerCase();
+  const username = parsed.data.username.trim().toLowerCase();
   const { data, error } = await admin.auth.admin.createUser({
-    email: parsed.data.email,
+    email,
     password,
     email_confirm: true,
-    user_metadata: { full_name: parsed.data.fullName, username: parsed.data.username, dept: parsed.data.dept },
+    user_metadata: { full_name: parsed.data.fullName, username, dept: parsed.data.dept },
   });
   if (error || !data.user) {
     return NextResponse.json({ error: error?.message ?? "Could not create user." }, { status: 400 });
@@ -44,7 +46,7 @@ export async function POST(req: Request) {
     .from("profiles")
     .update({
       full_name: parsed.data.fullName,
-      username: parsed.data.username,
+      username,
       dept: parsed.data.dept,
       role: parsed.data.role,
       status: "active",
