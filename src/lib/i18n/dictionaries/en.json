@@ -24,6 +24,7 @@
   "nav": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "tasks": "My Tasks",
     "tools": "Tools",
     "notifications": "Notifications",
     "departments": "Departments",
@@ -91,6 +92,30 @@
     "openTool": "Open tool",
     "tools": "tools",
     "live": "live"
+  },
+  "tasks": {
+    "title": "My Tasks",
+    "sub": "Your assigned work — update progress and collaborate.",
+    "mine": "My Tasks",
+    "managed": "Managed",
+    "create": "New task",
+    "titleField": "Task title",
+    "desc": "Description",
+    "assignee": "Assignee",
+    "priority": "Priority",
+    "due": "Due",
+    "status": "Status",
+    "todo": "To do",
+    "inProgress": "In progress",
+    "done": "Done",
+    "progress": "Progress",
+    "comments": "Comments",
+    "addComment": "Write a comment…",
+    "empty": "No tasks yet.",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent"
   },
   "notif": {
     "sub": "Your alerts and team announcements.",

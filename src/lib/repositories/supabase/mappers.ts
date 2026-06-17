@@ -2,6 +2,8 @@ import type {
   AuditEntry,
   Notification,
   Profile,
+  Task,
+  TaskComment,
   Tool,
   VisibilityRule,
 } from "../types";
@@ -68,6 +70,36 @@ export function mapAudit(r: any): AuditEntry {
     metadata: r.metadata ?? {},
     ip: r.ip ?? null,
     userAgent: r.user_agent ?? null,
+    createdAt: r.created_at,
+  };
+}
+
+export function mapTask(r: any): Task {
+  return {
+    id: r.id,
+    title: r.title,
+    description: r.description ?? "",
+    status: r.status,
+    priority: r.priority,
+    progress: r.progress ?? 0,
+    dueDate: r.due_date ?? null,
+    assigneeId: r.assignee_id,
+    assigneeName: r.assignee?.full_name ?? undefined,
+    createdBy: r.created_by ?? null,
+    dept: r.dept ?? null,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+    completedAt: r.completed_at ?? null,
+  };
+}
+
+export function mapTaskComment(r: any): TaskComment {
+  return {
+    id: r.id,
+    taskId: r.task_id,
+    authorId: r.author_id ?? null,
+    authorUsername: r.author_username ?? "",
+    body: r.body,
     createdAt: r.created_at,
   };
 }

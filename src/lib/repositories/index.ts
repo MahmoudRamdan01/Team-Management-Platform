@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AuditRepository } from "./audit.repository";
 import type { NotificationRepository } from "./notification.repository";
 import type { PresenceRepository } from "./presence.repository";
+import type { TaskRepository } from "./task.repository";
 import type { ToolRepository } from "./tool.repository";
 import type { UserRepository } from "./user.repository";
 import type { VisibilityRepository } from "./visibility.repository";
@@ -10,6 +11,7 @@ import type { VisibilityRepository } from "./visibility.repository";
 import { SupabaseAuditRepository } from "./supabase/audit.supabase";
 import { SupabaseNotificationRepository } from "./supabase/notification.supabase";
 import { SupabasePresenceRepository } from "./supabase/presence.supabase";
+import { SupabaseTaskRepository } from "./supabase/task.supabase";
 import { SupabaseToolRepository } from "./supabase/tool.supabase";
 import { SupabaseUserRepository } from "./supabase/user.supabase";
 import { SupabaseVisibilityRepository } from "./supabase/visibility.supabase";
@@ -27,6 +29,7 @@ export interface Repositories {
   audit: AuditRepository;
   notifications: NotificationRepository;
   presence: PresenceRepository;
+  tasks: TaskRepository;
 }
 
 export function makeSupabaseRepositories(db: SupabaseClient): Repositories {
@@ -37,6 +40,7 @@ export function makeSupabaseRepositories(db: SupabaseClient): Repositories {
     audit: new SupabaseAuditRepository(db),
     notifications: new SupabaseNotificationRepository(db),
     presence: new SupabasePresenceRepository(db),
+    tasks: new SupabaseTaskRepository(db),
   };
 }
 
@@ -48,4 +52,4 @@ export function getRepositories(db: SupabaseClient): Repositories {
   return makeSupabaseRepositories(db);
 }
 
-export type { UserRepository, ToolRepository, VisibilityRepository, AuditRepository, NotificationRepository, PresenceRepository };
+export type { UserRepository, ToolRepository, VisibilityRepository, AuditRepository, NotificationRepository, PresenceRepository, TaskRepository };
