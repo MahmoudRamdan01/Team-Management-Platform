@@ -23,20 +23,22 @@ export async function POST(req: Request) {
   }
 
   const supabase = createClient();
+  const email = parsed.data.email.trim().toLowerCase();
+  const username = parsed.data.username.trim().toLowerCase();
 
   // Uniqueness pre-check for a friendlier error than the DB constraint.
-  const existing = await getRepositories(supabase).users.getByUsername(parsed.data.username).catch(() => null);
+  const existing = await getRepositories(supabase).users.getByUsername(username).catch(() => null);
   if (existing) {
     return NextResponse.json({ error: "That username is taken." }, { status: 409 });
   }
 
   const { data, error } = await supabase.auth.signUp({
-    email: parsed.data.email,
+    email,
     password: parsed.data.password,
     options: {
       data: {
         full_name: parsed.data.fullName,
-        username: parsed.data.username,
+        username,
         dept: parsed.data.dept,
       },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/auth/callback`,

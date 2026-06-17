@@ -11,12 +11,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;600;700&family=Poppins:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Libraries (CDN) -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fflate@0.8.2/umd/index.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="/tools/reconciler/vendor/xlsx.bundle.js"></script>
+<script src="/tools/reconciler/vendor/fflate.js"></script>
+<script src="/tools/reconciler/vendor/pdf.min.js"></script>
 <script>
   if (window['pdfjsLib']) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/tools/reconciler/vendor/pdf.worker.min.js';
   }
 </script>
 
