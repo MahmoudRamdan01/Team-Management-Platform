@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LayoutDashboard, Wrench, Bell, Users, EyeOff, ScrollText, Building2, X } from "lucide-react";
+import { Home, LayoutDashboard, Wrench, Bell, CheckSquare, Users, EyeOff, ScrollText, Building2, X } from "lucide-react";
 import { AoiLogo } from "@/components/brand/AoiLogo";
 import { useAccess } from "@/lib/rbac/access-context";
 import { useI18n } from "@/lib/i18n/context";
@@ -19,6 +19,7 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
   const main = [
     { href: "/home", label: t("nav.home"), icon: Home, show: true },
     { href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard, show: true },
+    { href: "/tasks", label: t("nav.tasks"), icon: CheckSquare, show: can(PERMISSIONS.TASK_VIEW) },
     { href: "/tools", label: t("nav.tools"), icon: Wrench, show: can(PERMISSIONS.TOOL_VIEW) },
     { href: "/notifications", label: t("nav.notifications"), icon: Bell, show: true },
     { href: `/departments/${profile.dept}`, label: locale === "ar" ? dept?.nameAr : dept?.nameEn, icon: Building2, show: true },

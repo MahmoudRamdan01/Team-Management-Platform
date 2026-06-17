@@ -83,6 +83,28 @@ export const notificationSendSchema = z
     path: ["target"],
   });
 
+const PRIORITY = z.enum(["low", "medium", "high", "urgent"]);
+const TASK_STATUS = z.enum(["todo", "in_progress", "done"]);
+
+export const taskCreateSchema = z.object({
+  title: z.string().trim().min(2).max(160),
+  description: z.string().trim().max(4000).optional(),
+  priority: PRIORITY.default("medium"),
+  dueDate: z.string().datetime().nullable().optional(),
+  assigneeId: z.string().uuid(),
+});
+
+export const taskUpdateSchema = z.object({
+  title: z.string().trim().min(2).max(160).optional(),
+  description: z.string().trim().max(4000).optional(),
+  status: TASK_STATUS.optional(),
+  priority: PRIORITY.optional(),
+  progress: z.number().int().min(0).max(100).optional(),
+  dueDate: z.string().datetime().nullable().optional(),
+});
+
+export const taskCommentSchema = z.object({ body: z.string().trim().min(1).max(2000) });
+
 export const notificationReadSchema = z.object({
   id: z.string().uuid().optional(),
   all: z.boolean().optional(),

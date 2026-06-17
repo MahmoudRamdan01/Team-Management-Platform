@@ -155,3 +155,32 @@ export interface Page<T> {
   page: number;
   pageSize: number;
 }
+
+export type TaskStatus = "todo" | "in_progress" | "done";
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  progress: number;
+  dueDate: string | null;
+  assigneeId: string;
+  assigneeName?: string;
+  createdBy: string | null;
+  dept: DeptId | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+}
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  authorId: string | null;
+  authorUsername: string;
+  body: string;
+  createdAt: string;
+}

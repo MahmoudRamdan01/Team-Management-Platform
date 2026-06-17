@@ -12,6 +12,9 @@ export const PERMISSIONS = {
   TOOL_VIEW: "tool.view",
   TOOL_LAUNCH: "tool.launch",
 
+  TASK_VIEW: "task.view",
+  TASK_MANAGE: "task.manage",
+
   USER_VIEW: "user.view",
   USER_VIEW_DEPT: "user.view_dept",
   USER_MANAGE: "user.manage",
@@ -33,11 +36,13 @@ export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
  * from this same matrix; per-user overrides live in `user_permissions`.
  */
 export const ROLE_PERMISSIONS: Record<Role, PermissionKey[]> = {
-  employee: [PERMISSIONS.DASHBOARD_VIEW, PERMISSIONS.TOOL_VIEW, PERMISSIONS.TOOL_LAUNCH],
+  employee: [PERMISSIONS.DASHBOARD_VIEW, PERMISSIONS.TOOL_VIEW, PERMISSIONS.TOOL_LAUNCH, PERMISSIONS.TASK_VIEW],
   manager: [
     PERMISSIONS.DASHBOARD_VIEW,
     PERMISSIONS.TOOL_VIEW,
     PERMISSIONS.TOOL_LAUNCH,
+    PERMISSIONS.TASK_VIEW,
+    PERMISSIONS.TASK_MANAGE,
     PERMISSIONS.USER_VIEW_DEPT,
     PERMISSIONS.AUDIT_VIEW_DEPT,
   ],
@@ -46,6 +51,8 @@ export const ROLE_PERMISSIONS: Record<Role, PermissionKey[]> = {
     PERMISSIONS.DASHBOARD_VIEW_ALL,
     PERMISSIONS.TOOL_VIEW,
     PERMISSIONS.TOOL_LAUNCH,
+    PERMISSIONS.TASK_VIEW,
+    PERMISSIONS.TASK_MANAGE,
     PERMISSIONS.USER_VIEW,
     PERMISSIONS.USER_MANAGE,
     PERMISSIONS.VISIBILITY_MANAGE,
