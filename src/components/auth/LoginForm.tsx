@@ -47,14 +47,14 @@ export function LoginForm() {
         <div className="mb-4 rounded-xl border border-[#e54d4d73] bg-[#e54d4d1f] px-3 py-2.5 text-sm text-[#ff9d9d]">{error}</div>
       )}
 
-      <label className="label">البريد الإلكتروني</label>
+      <label className="label">اسم المستخدم أو البريد</label>
       <input
         className="input mb-3"
-        type="email"
+        type="text"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@airoceanline.com.eg"
-        autoComplete="email"
+        placeholder="mahmoud  أو  you@airocean.com"
+        autoComplete="username"
         required
       />
 

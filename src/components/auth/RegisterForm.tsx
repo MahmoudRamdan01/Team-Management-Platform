@@ -8,7 +8,7 @@ import { DEPARTMENTS } from "@/lib/constants/departments";
 
 export function RegisterForm() {
   const router = useRouter();
-  const [form, setForm] = useState({ fullName: "", username: "", email: "", dept: "operations", password: "", confirm: "" });
+  const [form, setForm] = useState({ fullName: "", username: "", dept: "operations", password: "", confirm: "" });
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,11 +60,11 @@ export function RegisterForm() {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="label">اسم المستخدم</label>
-          <input className="input mb-3" value={form.username} onChange={set("username")} placeholder="mahmoud" required />
+          <input className="input mb-1" value={form.username} onChange={set("username")} placeholder="mahmoud" required />
         </div>
         <div>
           <label className="label">القسم</label>
-          <select className="input mb-3" value={form.dept} onChange={set("dept")}>
+          <select className="input mb-1" value={form.dept} onChange={set("dept")}>
             {DEPARTMENTS.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.nameEn} — {d.nameAr}
@@ -73,9 +73,9 @@ export function RegisterForm() {
           </select>
         </div>
       </div>
-
-      <label className="label">البريد الإلكتروني</label>
-      <input className="input mb-3" type="email" value={form.email} onChange={set("email")} placeholder="you@airoceanline.com.eg" required />
+      <p className="mb-3 font-mono text-[0.62rem] text-mist">
+        هتسجّل الدخول بـ <span className="text-gold">{(form.username || "username").toLowerCase()}@airocean.com</span>
+      </p>
 
       <div className="grid grid-cols-2 gap-3">
         <div>

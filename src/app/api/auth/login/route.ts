@@ -5,6 +5,7 @@ import { getRepositories } from "@/lib/repositories";
 import { loginSchema } from "@/lib/validation/schemas";
 import { rateLimit } from "@/lib/ratelimit";
 import { clientIp } from "@/lib/services/audit.service";
+import { emailFromUsername } from "@/lib/constants/company";
 
 export async function POST(req: Request) {
   const h = headers();
@@ -25,7 +26,8 @@ export async function POST(req: Request) {
   const supabase = createClient();
   const repos = getRepositories(supabase);
 
-  const email = parsed.data.email.trim().toLowerCase();
+  // Accept a bare username (→ username@airocean.com) or a full email.
+  const email = emailFromUsername(parsed.data.email);
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password: parsed.data.password,

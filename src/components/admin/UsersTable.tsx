@@ -12,8 +12,8 @@ export function UsersTable({ users: initial, actorRole }: { users: Profile[]; ac
   const [users, setUsers] = useState(initial);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [tempPw, setTempPw] = useState<string | null>(null);
-  const [add, setAdd] = useState({ fullName: "", username: "", email: "", dept: "operations", role: "employee" as Role });
+  const [tempPw, setTempPw] = useState<{ password: string; email: string } | null>(null);
+  const [add, setAdd] = useState({ fullName: "", username: "", dept: "operations", role: "employee" as Role });
 
   const assignableRoles = ROLES.filter((r) => canManageRole(actorRole, r));
 
@@ -47,9 +47,9 @@ export function UsersTable({ users: initial, actorRole }: { users: Profile[]; ac
       });
       const data = await res.json();
       if (res.ok) {
-        setTempPw(data.tempPassword);
+        setTempPw({ password: data.tempPassword, email: data.email });
         setShowAdd(false);
-        setAdd({ fullName: "", username: "", email: "", dept: "operations", role: "employee" });
+        setAdd({ fullName: "", username: "", dept: "operations", role: "employee" });
         router.refresh();
       } else {
         alert(data.error ?? "Failed");
@@ -69,9 +69,10 @@ export function UsersTable({ users: initial, actorRole }: { users: Profile[]; ac
 
       {tempPw && (
         <div className="card flex items-center gap-3 border-gold/40 p-4 text-sm">
-          <KeyRound size={18} className="text-gold" />
+          <KeyRound size={18} className="shrink-0 text-gold" />
           <span className="text-foam">
-            Temporary password: <span className="font-mono text-gold">{tempPw}</span> — share it; the user must change it on first login.
+            Login: <span className="font-mono text-gold">{tempPw.email}</span> · temp password:{" "}
+            <span className="font-mono text-gold">{tempPw.password}</span> — share it; they change it on first login.
           </span>
           <button onClick={() => setTempPw(null)} className="ms-auto text-mist hover:text-foam">
             ✕
@@ -80,10 +81,14 @@ export function UsersTable({ users: initial, actorRole }: { users: Profile[]; ac
       )}
 
       {showAdd && (
-        <div className="card grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-6">
+        <div className="card grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-5">
           <input className="input" placeholder="Full name" value={add.fullName} onChange={(e) => setAdd({ ...add, fullName: e.target.value })} />
-          <input className="input" placeholder="username" value={add.username} onChange={(e) => setAdd({ ...add, username: e.target.value })} />
-          <input className="input" placeholder="email" value={add.email} onChange={(e) => setAdd({ ...add, email: e.target.value })} />
+          <input
+            className="input"
+            placeholder="username → @airocean.com"
+            value={add.username}
+            onChange={(e) => setAdd({ ...add, username: e.target.value })}
+          />
           <select className="input" value={add.dept} onChange={(e) => setAdd({ ...add, dept: e.target.value })}>
             {DEPARTMENTS.map((d) => (
               <option key={d.id} value={d.id}>
