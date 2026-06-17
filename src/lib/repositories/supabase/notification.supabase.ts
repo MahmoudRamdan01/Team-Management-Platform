@@ -40,6 +40,31 @@ export class SupabaseNotificationRepository implements NotificationRepository {
     if (error) throw error;
   }
 
+  async markAllRead(userId: string): Promise<void> {
+    const { error } = await this.db
+      .from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .or(`user_id.eq.${userId},user_id.is.null`)
+      .is("read_at", null);
+    if (error) throw error;
+  }
+
+  async createMany(inputs: CreateNotificationInput[]): Promise<number> {
+    if (inputs.length === 0) return 0;
+    const rows = inputs.map((input) => ({
+      user_id: input.userId,
+      type: input.type ?? "info",
+      title_en: input.titleEn,
+      title_ar: input.titleAr,
+      body_en: input.bodyEn ?? "",
+      body_ar: input.bodyAr ?? "",
+      data: input.data ?? {},
+    }));
+    const { error, count } = await this.db.from("notifications").insert(rows, { count: "exact" });
+    if (error) throw error;
+    return count ?? rows.length;
+  }
+
   async create(input: CreateNotificationInput): Promise<Notification> {
     const { data, error } = await this.db
       .from("notifications")

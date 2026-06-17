@@ -68,6 +68,28 @@ export const createUserSchema = z.object({
   role: ROLE.default("employee"),
 });
 
+export const notificationSendSchema = z
+  .object({
+    audience: z.enum(["all", "department", "role", "user"]),
+    target: z.string().optional(),
+    type: z.enum(["info", "success", "warning", "urgent"]).default("info"),
+    titleEn: z.string().trim().min(1).max(140),
+    titleAr: z.string().trim().min(1).max(140),
+    bodyEn: z.string().trim().max(2000).optional(),
+    bodyAr: z.string().trim().max(2000).optional(),
+  })
+  .refine((d) => d.audience === "all" || !!d.target, {
+    message: "A target is required for this audience",
+    path: ["target"],
+  });
+
+export const notificationReadSchema = z.object({
+  id: z.string().uuid().optional(),
+  all: z.boolean().optional(),
+});
+
+export type NotificationSendInput = z.infer<typeof notificationSendSchema>;
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type VisibilityRuleInput = z.infer<typeof visibilityRuleSchema>;
