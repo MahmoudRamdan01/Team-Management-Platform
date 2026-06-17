@@ -1,0 +1,80 @@
+{
+  "brand": { "name": "AOI Team Hub", "tag": "TEAM HUB · INTERNAL", "company": "Air Ocean Line" },
+  "auth": {
+    "loginTitle": "Welcome back",
+    "loginSub": "Sign in to reach your team's tools.",
+    "registerTitle": "Join the AOI team",
+    "registerSub": "Create your account and pick your department.",
+    "email": "Email",
+    "username": "Username",
+    "fullName": "Full name",
+    "department": "Department",
+    "password": "Password",
+    "confirm": "Confirm password",
+    "remember": "Remember me",
+    "login": "Sign in",
+    "register": "Create account",
+    "logout": "Sign out",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Need an account?",
+    "changeTitle": "Set a new password",
+    "changeSub": "For your security, choose a new password before continuing.",
+    "save": "Save and continue"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "tools": "Tools",
+    "departments": "Departments",
+    "admin": "Admin",
+    "users": "Users",
+    "visibility": "Tool Visibility",
+    "audit": "Audit Logs"
+  },
+  "dashboard": {
+    "title": "Executive Dashboard",
+    "sub": "Live overview of your team.",
+    "totalUsers": "Total users",
+    "activeUsers": "Active users",
+    "activeSessions": "Active sessions",
+    "onlineNow": "Online now",
+    "toolsLive": "Live tools",
+    "roleDist": "Role distribution",
+    "deptDist": "Department distribution",
+    "recentActivity": "Recent activity"
+  },
+  "tools": {
+    "title": "Tools & Workflows",
+    "sub": "Everything you're allowed to use, in one place.",
+    "open": "Open",
+    "soon": "Coming soon",
+    "live": "Live",
+    "empty": "No tools are visible to you yet. Ask an admin to grant access.",
+    "launch": "Launch tool",
+    "denied": "You don't have access to this tool."
+  },
+  "admin": {
+    "usersTitle": "User Management",
+    "visibilityTitle": "Tool Visibility Engine",
+    "visibilitySub": "Show or hide tools per user, role or department — no code changes.",
+    "auditTitle": "Audit Logs",
+    "scope": "Scope",
+    "subject": "Subject",
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "tool": "Tool",
+    "addRule": "Add rule",
+    "role": "Role",
+    "status": "Status",
+    "actions": "Actions",
+    "save": "Save"
+  },
+  "common": {
+    "loading": "Loading…",
+    "offline": "Offline — showing cached data",
+    "search": "Search",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "cancel": "Cancel"
+  }
+}

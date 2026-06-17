@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand tokens carried over verbatim from the original AOI Team Hub. */
+:root {
+  --ink: #0c1722;
+  --navy: #111e2c;
+  --panel: #192634;
+  --panel2: #22313f;
+  --line: rgba(178, 204, 230, 0.1);
+  --line2: rgba(178, 204, 230, 0.2);
+  --foam: #f2f6fa;
+  --mist: #94a7b8;
+  --gold: #f7b733;
+  --gold2: #e9a41c;
+  --gold-ink: #3a2a05;
+  --gold-soft: rgba(247, 183, 51, 0.13);
+}
+
+@layer base {
+  * {
+    @apply border-0;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-ink text-foam font-sans;
+    font-weight: 300;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--gold);
+    color: var(--gold-ink);
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--ink);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--panel2);
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-brand border border-white/10 bg-gradient-to-br from-panel2 to-panel;
+  }
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[0.62rem] tracking-widest;
+  }
+  .btn-gold {
+    @apply rounded-full bg-gradient-to-br from-[#FFD069] via-gold to-gold-dark px-6 py-3 font-semibold text-gold-ink transition hover:-translate-y-0.5;
+  }
+  .btn-ghost {
+    @apply rounded-full border border-white/20 bg-white/5 px-6 py-3 font-medium text-foam transition hover:border-gold;
+  }
+  .input {
+    @apply w-full rounded-xl border border-[#243a52] bg-ink px-3.5 py-2.5 text-sm text-foam outline-none transition focus:border-gold;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold text-[#B9C6D2];
+  }
+}
+
+.view-in {
+  animation: viewIn 0.45s cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+@keyframes viewIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
