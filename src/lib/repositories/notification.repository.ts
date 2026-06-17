@@ -14,5 +14,7 @@ export interface NotificationRepository {
   listForUser(userId: string, limit?: number): Promise<Notification[]>;
   unreadCount(userId: string): Promise<number>;
   markRead(id: string, userId: string): Promise<void>;
+  markAllRead(userId: string): Promise<void>;
   create(input: CreateNotificationInput): Promise<Notification>;
+  createMany(inputs: CreateNotificationInput[]): Promise<number>;
 }

@@ -6,6 +6,7 @@ import { useAccess } from "@/lib/rbac/access-context";
 import { useI18n } from "@/lib/i18n/context";
 import { ROLE_LABELS } from "@/lib/rbac/roles";
 import { DEPARTMENT_MAP } from "@/lib/constants/departments";
+import { NotificationsBell } from "./NotificationsBell";
 
 export function TopNav({ onlineCount, onBurger }: { onlineCount: number; onBurger: () => void }) {
   const router = useRouter();
@@ -36,6 +37,8 @@ export function TopNav({ onlineCount, onBurger }: { onlineCount: number; onBurge
           <Circle size={8} className="fill-ops text-ops" />
           {onlineCount} {t("dashboard.onlineNow")}
         </span>
+
+        <NotificationsBell />
 
         <button
           onClick={() => setLocale(locale === "ar" ? "en" : "ar")}
