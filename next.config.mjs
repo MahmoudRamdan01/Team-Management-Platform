@@ -3,31 +3,47 @@ import withPWAInit from "@ducanh2912/next-pwa";
 const isDev = process.env.NODE_ENV === "development";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const SUPABASE_WSS = SUPABASE_URL.replace("https://", "wss://");
 
 /**
- * Content Security Policy. We self-host fonts and the reconciler's vendor libs,
- * so the only remote origin we must allow is the Supabase project (REST +
- * Realtime websockets + storage). 'unsafe-inline'/'unsafe-eval' are required by
- * the wrapped legacy reconciler (inline scripts) which runs same-origin.
+ * Strict CSP for the application itself. The only remote origins are the Supabase
+ * project (REST + Realtime websockets + storage). 'unsafe-inline' is needed for
+ * Next's inline runtime; we intentionally do NOT allow 'unsafe-eval' here.
  */
-const csp = [
+const appCsp = [
   `default-src 'self'`,
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval'`,
+  `script-src 'self' 'unsafe-inline'`,
   `style-src 'self' 'unsafe-inline'`,
   `img-src 'self' data: blob:`,
   `font-src 'self' data:`,
-  `connect-src 'self' ${SUPABASE_URL} ${SUPABASE_URL.replace("https://", "wss://")} https://*.supabase.co wss://*.supabase.co`,
+  `connect-src 'self' ${SUPABASE_URL} ${SUPABASE_WSS} https://*.supabase.co wss://*.supabase.co`,
   `frame-src 'self'`,
   `frame-ancestors 'self'`,
   `base-uri 'self'`,
   `form-action 'self'`,
   `object-src 'none'`,
-]
-  .filter(Boolean)
-  .join("; ");
+].join("; ");
 
-const securityHeaders = [
-  { key: "Content-Security-Policy", value: csp },
+/**
+ * Scoped CSP for the wrapped legacy reconciler. It runs same-origin in an iframe
+ * and loads xlsx-js-style / fflate (jsDelivr), pdf.js (cdnjs) and Google Fonts,
+ * and may talk to a local Ollama instance. These allowances are confined to this
+ * path only — the rest of the app keeps the strict policy above.
+ */
+const reconcilerCsp = [
+  `default-src 'self'`,
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com`,
+  `worker-src 'self' blob: https://cdnjs.cloudflare.com`,
+  `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+  `font-src 'self' data: https://fonts.gstatic.com`,
+  `img-src 'self' data: blob:`,
+  `connect-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://localhost:11434`,
+  `frame-ancestors 'self'`,
+  `base-uri 'self'`,
+  `object-src 'none'`,
+].join("; ");
+
+const baseSecurity = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -42,7 +58,18 @@ const nextConfig = {
   // Type safety is enforced via `tsc --noEmit`; lint runs in CI, not the build.
   eslint: { ignoreDuringBuilds: true },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      {
+        // Reconciler keeps its own relaxed CSP.
+        source: "/tools/reconciler/:path*",
+        headers: [...baseSecurity, { key: "Content-Security-Policy", value: reconcilerCsp }],
+      },
+      {
+        // Everything else gets the strict CSP (exclude the reconciler subtree).
+        source: "/((?!tools/reconciler).*)",
+        headers: [...baseSecurity, { key: "Content-Security-Policy", value: appCsp }],
+      },
+    ];
   },
 };
 
