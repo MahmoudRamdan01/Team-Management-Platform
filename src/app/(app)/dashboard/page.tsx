@@ -30,22 +30,33 @@ export default async function DashboardPage() {
   }));
 
   return (
-    <div className="space-y-7">
-      <header>
-        <h1 className="font-brand text-2xl font-bold text-foam sm:text-3xl">{t("dashboard.title")}</h1>
-        <p className="mt-1 text-sm text-mist">{t("dashboard.sub")}</p>
+    <div className="space-y-10 view-in">
+      <header className="flex flex-col gap-2">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-1.5 rounded-full bg-gold shadow-[0_0_15px_rgba(247,183,51,0.5)]" />
+          <h1 className="font-brand text-3xl font-black text-white sm:text-4xl tracking-tight">
+            {t("dashboard.title")}
+          </h1>
+        </div>
+        <p className="text-mist text-lg font-medium opacity-80">{t("dashboard.sub")}</p>
       </header>
 
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label={t("dashboard.totalUsers")} value={stats.totalUsers} icon={Users} accent="#4FC3F7" />
         <StatCard label={t("dashboard.activeUsers")} value={stats.activeUsers} icon={UserCheck} accent="#43D9A0" />
         <StatCard label={t("dashboard.activeSessions")} value={stats.activeSessions} icon={Activity} accent="#F7B733" />
         <StatCard label={t("dashboard.toolsLive")} value={stats.toolsLive} icon={Wrench} accent="#B49CFF" />
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-3">
-        {canViewAll && <DistributionBar title={t("dashboard.roleDist")} data={roleData} />}
-        <DistributionBar title={t("dashboard.deptDist")} data={deptData} />
+      <section className="grid gap-6 lg:grid-cols-3">
+        {canViewAll && (
+          <div className="lg:col-span-1">
+            <DistributionBar title={t("dashboard.roleDist")} data={roleData} />
+          </div>
+        )}
+        <div className={canViewAll ? "lg:col-span-1" : "lg:col-span-1"}>
+          <DistributionBar title={t("dashboard.deptDist")} data={deptData} />
+        </div>
         <div className={canViewAll ? "lg:col-span-1" : "lg:col-span-2"}>
           <ActivityFeed entries={stats.recentActivity} title={t("dashboard.recentActivity")} />
         </div>
