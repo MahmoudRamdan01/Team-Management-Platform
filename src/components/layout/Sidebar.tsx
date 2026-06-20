@@ -123,10 +123,10 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
           <div className="rounded-2xl bg-white/5 p-4 border border-white/5 group hover:border-gold/20 transition-colors">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center text-gold font-bold">
-                {profile.name?.charAt(0) || "U"}
+                {profile.fullName?.charAt(0) || "U"}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-white truncate">{profile.name}</div>
+                <div className="text-sm font-bold text-white truncate">{profile.fullName}</div>
                 <div className="text-[0.7rem] text-mist truncate uppercase tracking-wider">{profile.role}</div>
               </div>
             </div>

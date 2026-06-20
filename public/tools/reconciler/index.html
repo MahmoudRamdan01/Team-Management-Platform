@@ -1725,6 +1725,10 @@ body.pricing-locked .locked-hide { display: none !important; }
             <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10"/></svg>
             تنزيل ملف Olivery بعد التعديلات
           </button>
+          <button class="btn btn-accent" id="armexDownloadModBtn" style="border:2px solid var(--gold);box-shadow:0 0 0 3px rgba(247,183,51,.18);">
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h10v10H3z M3 7h10 M7 3v10"/></svg>
+            🆕 تنزيل Modifications of Armex (تقرير التعديلات)
+          </button>
         </div>
         <div class="log-panel" id="armexLog" style="margin-top:16px;"></div>
       </div>
@@ -4240,7 +4244,12 @@ function runEgyEngine() {
     const col = "التاجر/Extra Sequence Number";
     rows.forEach((row, i) => {
       const orig = row[col];
-      if (orig == null) return;
+      // الفاضي → flag (محتاج تعبئة يدوية، و«الصح» يتساب فاضي في تقرير الأخطاء)
+      if (orig == null || String(orig).trim() === "") {
+        recordChange(i, col, orig, orig, "flag", "G: رقم مرجعي فاضي — مشكلة");
+        stats.ref_flag = (stats.ref_flag || 0) + 1;
+        return;
+      }
       let s = String(orig).trim().replace(/-0(\d)/g, "-$1");
       let newVal = orig;
       if (s !== String(orig)) {
@@ -4429,23 +4438,18 @@ function buildEgyModificationsAOL() {
       const entry = ch[egyCol];
       if (!entry) return;                  // الحقل ده مفهوش خطأ في الصف ده
 
-      // معالجة خاصة لـ «اسم الراسل» (Pickup Sequnce):
+      // معالجة خاصة لـ «اسم الراسل» (Pickup Sequnce): لو القيمة فاضية → ما يتكتبش خالص
       if (egyCol === "Pickup Sequnce") {
         const oldStr = entry.old == null ? "" : String(entry.old).trim();
-        // (1) لو القيمة فاضية → ما يتكتبش من ضمن الأخطاء خالص
         if (oldStr === "" || oldStr === "(blank)" || entry.old == null) return;
-        const errCol = 2 + pi * 2, corCol = errCol + 1;
-        cells[errCol] = aolCell(entry.old);
-        // (2) لو القيمة الخطأ = 0 → القيمة الصح تفضل فاضية
-        cells[corCol] = (oldStr === "0") ? null : aolCell(entry.new);
-        anyMappedError = true;
-        return;
       }
 
       const errCol = 2 + pi * 2;           // عمود العنوان = الخطأ
       const corCol = errCol + 1;           // العمود اللي بعده = الصح
       cells[errCol] = aolCell(entry.old);  // القيمة الخطأ
-      cells[corCol] = aolCell(entry.new);  // القيمة الصح
+      // flag = مراجعة يدوية → «الصح» يتساب فاضي عشان المستخدم يكتبه ·
+      // change = تصحيح تلقائي → نكتب القيمة المصحّحة
+      cells[corCol] = (entry.kind === "flag") ? null : aolCell(entry.new);
       anyMappedError = true;
     });
 
@@ -4966,11 +4970,11 @@ function runEgyF2Engine() {
   };
   const perCol = {};
 
-  // changeMap: rowIdx → { outColName: {kind} }  (for highlighting)
+  // changeMap: rowIdx → { outColName: kind }  ("mismatch" = مختلف سِيب EGY · "adopt" = معتمَد من Olivery)
   const changeMap = new Map();
-  function flag(rowIdx, col) {
+  function flag(rowIdx, col, kind) {
     if (!changeMap.has(rowIdx)) changeMap.set(rowIdx, {});
-    changeMap.get(rowIdx)[col] = true;
+    changeMap.get(rowIdx)[col] = kind || "mismatch";
   }
 
   const outRows = [];
@@ -4986,20 +4990,39 @@ function runEgyF2Engine() {
     const status = egyF2MapStatus(row["الحاله"]);
     if (status) stats.status_gen++;
 
-    // Step 3: match → highlight EGY cells that differ (keep EGY value)
+    // Step 3: match → نعتمد Olivery للكود والموبايل، والباقي highlight (نسيب قيمة EGY)
     if (oRow) {
       for (const [ec, oc] of EGY_F2_MATCH_PAIRS) {
         const ev = egyF2Norm(row[ec]), ov = egyF2Norm(oRow[oc]);
         if (ev !== ov) {
+          // «الكود» (المرسل/ID): نعتمد قيمة Olivery لو عنده قيمة → نكتبها مكان EGY ونعلّم
+          if (ec === "Request Number") {
+            if (ov !== "") {
+              row[ec] = oRow[oc];                       // adopt Olivery (بيظهر في الإخراج عبر r.src)
+              stats.adopted_code = (stats.adopted_code || 0) + 1;
+              flag(i, ec, "adopt");
+            } else {
+              flag(i, ec, "mismatch");                  // Olivery فاضي → علّم بس وسيب EGY
+            }
+            continue;
+          }
           stats.mismatches++;
           perCol[EGY_F2_RENAME[ec] || ec] = (perCol[EGY_F2_RENAME[ec] || ec] || 0) + 1;
-          flag(i, ec);   // mark by ORIGINAL col name
+          flag(i, ec, "mismatch");   // mark by ORIGINAL col name
         }
+      }
+      // الموبايل: لو موبايل EGY فاضي أو كله أصفار → نعتمد موبايل Olivery (مع هايلايت)
+      const egyMob = String(row["Client Mobile"] == null ? "" : row["Client Mobile"]).replace(/\s/g, "").trim();
+      const olMob  = oRow["موبايل المستلم"];
+      if ((egyMob === "" || /^0+$/.test(egyMob)) && olMob != null && String(olMob).trim() !== "") {
+        row["Client Mobile"] = olMob;
+        stats.adopted_mobile = (stats.adopted_mobile || 0) + 1;
+        flag(i, "Client Mobile", "adopt");
       }
       // الشحن vs تكلفة الموزع (skip if no-shipping comment)
       if (!noShip) {
         const ship = egyF2Norm(row["الشحن"]), dist = egyF2Norm(oRow["تكلفة الموزع"]);
-        if (ship !== dist) { stats.ship_mismatch++; flag(i, "الشحن"); }
+        if (ship !== dist) { stats.ship_mismatch++; flag(i, "الشحن", "mismatch"); }
       }
     }
 
@@ -5097,7 +5120,10 @@ function buildEgyF2Output(errorsOnly) {
       if (colIdx < 0) continue;
       const addr = XLSX.utils.encode_cell({ r: outR + 1, c: colIdx });
       if (!ws[addr]) ws[addr] = { t: "s", v: "" };
-      ws[addr].s = { fill: { patternType: "solid", fgColor: { rgb: "FED7AA" }, bgColor: { rgb: "FED7AA" } }, font: { color: { rgb: "9A3412" }, bold: true } };
+      // adopt = معتمَد من Olivery (أزرق) · غير كده = قيمة مختلفة سِيبت EGY (برتقالي)
+      ws[addr].s = (cols[origCol] === "adopt")
+        ? { fill: { patternType: "solid", fgColor: { rgb: "DBEAFE" }, bgColor: { rgb: "DBEAFE" } }, font: { color: { rgb: "1E40AF" }, bold: true } }
+        : { fill: { patternType: "solid", fgColor: { rgb: "FED7AA" }, bgColor: { rgb: "FED7AA" } }, font: { color: { rgb: "9A3412" }, bold: true } };
     }
   }
 
@@ -5117,6 +5143,8 @@ function renderEgyF2Summary() {
     { label: "غير متطابق", value: s.unmatched, kind: s.unmatched > 0 ? "warn" : "" },
     { label: "الحالة مولّدة", value: s.status_gen },
     { label: "قيم مختلفة (highlight)", value: s.mismatches, kind: s.mismatches > 0 ? "warn" : "" },
+    { label: "كود معتمَد من Olivery", value: s.adopted_code || 0 },
+    { label: "موبايل معتمَد من Olivery", value: s.adopted_mobile || 0 },
     { label: "الشحن ≠ تكلفة الموزع", value: s.ship_mismatch, kind: s.ship_mismatch > 0 ? "warn" : "" },
     { label: "الشحن ≠ التكلفة المحسوبة", value: s.cost_mismatch, kind: s.cost_mismatch > 0 ? "warn" : "" },
     { label: "مناطق غير مصنّفة", value: s.cost_unclassified, kind: s.cost_unclassified > 0 ? "warn" : "" },
@@ -5297,8 +5325,8 @@ function runArmexEngine() {
 
   const headers = ol.headers.slice();
   const rows = ol.rows.map(r => ({ ...r }));
-  const changeMap = new Map();   // rowIdx → { colName: kind }
-  function mark(i, col, kind) { if (!changeMap.has(i)) changeMap.set(i, {}); changeMap.get(i)[col] = kind; }
+  const changeMap = new Map();   // rowIdx → { colName: {kind, old, new} }
+  function mark(i, col, kind, oldV, newV) { if (!changeMap.has(i)) changeMap.set(i, {}); changeMap.get(i)[col] = { kind, old: oldV === undefined ? null : oldV, new: newV === undefined ? null : newV }; }
 
   const stats = {
     total: rows.length, matched: 0, unmatched: 0,
@@ -5323,23 +5351,23 @@ function runArmexEngine() {
   rows.forEach((row, i) => {
     // ---- Rule A: alt merchant zone if FALSE → merchant zone ----
     if (armexIsBlankOrFalse(row[COL.altZone]) && !armexIsBlankOrFalse(row[COL.zone])) {
-      row[COL.altZone] = row[COL.zone]; mark(i, COL.altZone, "fill"); stats.alt_zone++;
+      const oldV = row[COL.altZone]; row[COL.altZone] = row[COL.zone]; mark(i, COL.altZone, "fill", oldV, row[COL.zone]); stats.alt_zone++;
     }
     // ---- Rule B: alt merchant sub-zone if FALSE → merchant sub-zone ----
     if (armexIsBlankOrFalse(row[COL.altSub]) && !armexIsBlankOrFalse(row[COL.sub])) {
-      row[COL.altSub] = row[COL.sub]; mark(i, COL.altSub, "fill"); stats.alt_subzone++;
+      const oldV = row[COL.altSub]; row[COL.altSub] = row[COL.sub]; mark(i, COL.altSub, "fill", oldV, row[COL.sub]); stats.alt_subzone++;
     }
     // ---- Rule B2: alt merchant address if FALSE → merchant/sender address ----
     if (COL.addrSrc && armexIsBlankOrFalse(row[COL.altAddr]) && !armexIsBlankOrFalse(row[COL.addrSrc])) {
-      row[COL.altAddr] = row[COL.addrSrc]; mark(i, COL.altAddr, "fill"); stats.alt_address++;
+      const oldV = row[COL.altAddr]; row[COL.altAddr] = row[COL.addrSrc]; mark(i, COL.altAddr, "fill", oldV, row[COL.addrSrc]); stats.alt_address++;
     }
     // ---- Rule B3: alt name if FALSE → sender/trade name ----
     if (COL.nameSrc && armexIsBlankOrFalse(row[COL.altName]) && !armexIsBlankOrFalse(row[COL.nameSrc])) {
-      row[COL.altName] = row[COL.nameSrc]; mark(i, COL.altName, "fill"); stats.alt_name++;
+      const oldV = row[COL.altName]; row[COL.altName] = row[COL.nameSrc]; mark(i, COL.altName, "fill", oldV, row[COL.nameSrc]); stats.alt_name++;
     }
     // ---- Rule C: manifest FALSE → flag ----
     if (armexIsBlankOrFalse(row[COL.manifest])) {
-      mark(i, COL.manifest, "flag"); stats.manifest_flag++;
+      mark(i, COL.manifest, "flag", row[COL.manifest], row[COL.manifest]); stats.manifest_flag++;
     }
 
     // ---- Match to Armex by AWB ----
@@ -5351,13 +5379,13 @@ function runArmexEngine() {
     // اسم المستلم ← ConsigneeName
     const arName = a["ConsigneeName"];
     if (arName != null && String(arName).trim() !== "" && String(arName).trim() !== String(row[COL.name] == null ? "" : row[COL.name]).trim()) {
-      row[COL.name] = String(arName).trim(); mark(i, COL.name, "change"); stats.name++;
+      const oldV = row[COL.name]; row[COL.name] = String(arName).trim(); mark(i, COL.name, "change", oldV, row[COL.name]); stats.name++;
     }
     // موبايل المستلم ← Consignee Phone Number (normalized; only if core differs)
     const arPhoneCore = armexPhoneCore(a["Consignee Phone Number"]);
     const olPhoneCore = armexPhoneCore(row[COL.phone]);
     if (arPhoneCore && arPhoneCore !== olPhoneCore) {
-      row[COL.phone] = "0" + arPhoneCore; mark(i, COL.phone, "change"); stats.phone++;
+      const oldV = row[COL.phone]; row[COL.phone] = "0" + arPhoneCore; mark(i, COL.phone, "change", oldV, row[COL.phone]); stats.phone++;
     }
     // الحالة ← Status (mapped)
     const arStatusRaw = a["Status"];
@@ -5372,7 +5400,7 @@ function runArmexEngine() {
         if (cur !== key) newStatus = arStatusRaw;  // passthrough unknown
       }
       if (newStatus != null && newStatus !== row[COL.status]) {
-        row[COL.status] = newStatus; mark(i, COL.status, "change"); stats.status++;
+        const oldV = row[COL.status]; row[COL.status] = newStatus; mark(i, COL.status, "change", oldV, newStatus); stats.status++;
       }
     }
     // تاريخ الاستلام ← Pickup Date (Creation Date)
@@ -5380,8 +5408,9 @@ function runArmexEngine() {
     if (arPD) {
       const oldPD = row[COL.pickupDate] instanceof Date ? row[COL.pickupDate] : armexParseDate(row[COL.pickupDate]);
       if (!armexSameDate(arPD, oldPD)) {
+        const oldV = row[COL.pickupDate];
         row[COL.pickupDate] = new Date(arPD.getFullYear(), arPD.getMonth(), arPD.getDate());
-        mark(i, COL.pickupDate, row[COL.pickupDate] == null ? "fill" : "change"); stats.pickup_date++;
+        mark(i, COL.pickupDate, row[COL.pickupDate] == null ? "fill" : "change", oldV, row[COL.pickupDate]); stats.pickup_date++;
       }
     }
     // تاريخ التوصيل ← Delivery Status Action Date
@@ -5389,8 +5418,9 @@ function runArmexEngine() {
     if (arDD) {
       const oldDD = row[COL.deliveryDate] instanceof Date ? row[COL.deliveryDate] : armexParseDate(row[COL.deliveryDate]);
       if (!armexSameDate(arDD, oldDD)) {
+        const oldV = row[COL.deliveryDate];
         row[COL.deliveryDate] = new Date(arDD.getFullYear(), arDD.getMonth(), arDD.getDate());
-        mark(i, COL.deliveryDate, "change"); stats.delivery_date++;
+        mark(i, COL.deliveryDate, "change", oldV, row[COL.deliveryDate]); stats.delivery_date++;
       }
     }
     // الأوزان الثلاثة ← Chargeable Weight
@@ -5399,7 +5429,7 @@ function runArmexEngine() {
       [COL.wVol, COL.wAct, COL.wFin].forEach(wc => {
         const cur = armexNum(row[wc]);
         if (cur == null || Math.abs(cur - arW) > 1e-9) {
-          row[wc] = arW; mark(i, wc, "change"); stats.weight++;
+          const oldV = row[wc]; row[wc] = arW; mark(i, wc, "change", oldV, arW); stats.weight++;
         }
       });
     }
@@ -5408,7 +5438,7 @@ function runArmexEngine() {
     if (arCod != null) {
       const olCod = armexNum(row[COL.cod]);
       if (olCod == null || Math.abs(olCod - arCod) > 1e-9) {
-        row[COL.cod] = arCod; mark(i, COL.cod, "flag"); stats.cod++;
+        const oldV = row[COL.cod]; row[COL.cod] = arCod; mark(i, COL.cod, "flag", oldV, arCod); stats.cod++;
       }
     }
   });
@@ -5436,7 +5466,8 @@ function buildArmexOutput() {
 
   // highlights
   for (const [rowIdx, cols] of changeMap.entries()) {
-    for (const [colName, kind] of Object.entries(cols)) {
+    for (const [colName, entry] of Object.entries(cols)) {
+      const kind = entry.kind;
       const c = outHeaders.indexOf(colName); if (c < 0) continue;
       const addr = XLSX.utils.encode_cell({ r: rowIdx+1, c });
       if (!ws[addr]) ws[addr] = { t: "s", v: "" };
@@ -5451,6 +5482,138 @@ function buildArmexOutput() {
   XLSX.utils.book_append_sheet(wb, ws, "Olivery");
   const stamp = new Date().toISOString().slice(0,10);
   XLSX.writeFile(wb, `olivery_armex_${stamp}.xlsx`, { cellStyles: true });
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// Modifications_of_Armex — تقرير التعديلات (نفس فكرة Modifications_of_AOL بتاع EGY)
+// لكل صف Olivery اتعدّل: عمود «خطأ» = قيمة Olivery القديمة · «الصح» = القيمة الجديدة من Armex.
+// حقول الـ flag (COD/معرف الكشف) «الصح» بتاعها يفضل فاضي للمراجعة اليدوية.
+// الشيت يتحدد بالحالة: delivered → «تم التسليم» · غير كده → «تحت التسليم» · + شيت «Armex» بكل الصفوف.
+// المصدر للقيمة الصح = changeMap.new والخطأ = changeMap.old.
+// ════════════════════════════════════════════════════════════════════════
+const ARMEX_MOD_PAIRS = [
+  ["اسم المستلم",            "اسم المستلم"],
+  ["موبايل المستلم",          "موبايل المستلم"],
+  ["الوزن الحجمي",            "الوزن الحجمي (كجم)"],
+  ["الوزن الفعلي",            "الوزن الفعلي (كجم)"],
+  ["الوزن النهائي",           "الوزن النهائي (كجم)"],
+  ["مجموع التحصيل (COD)",      "مجموع التحصيل"],
+  ["معرف كشف الاستلام",        "معرف كشف استلام الشحنات/التسلسل"],
+  ["الاسم البديل",            "الاسم البديل"],
+  ["منطقة التاجر البديلة",     "منطقة التاجر البديلة/الاسم"],
+  ["المنطقة الفرعية البديلة",  "المنطقة الفرعية البديلة للتاجر/الاسم"]
+];
+// عمودا الـ context الثابتين ومصدرهم في ملف Olivery (منطقة التاجر الأول ثم الرقم المرجعي)
+const ARMEX_MOD_CTX = ["منطقة التاجر", "الرقم المرجعي"];
+
+function buildArmexModificationsReport() {
+  const { rows, changeMap } = armex.result;
+
+  // رؤوس الشيت: الرقم المرجعي | منطقة التاجر | [لكل زوج: العنوان | فاضي]
+  const header = [ARMEX_MOD_CTX[0], ARMEX_MOD_CTX[1]];
+  ARMEX_MOD_PAIRS.forEach(([label]) => { header.push(label); header.push(null); });
+
+  const sheets = {
+    "تحت التسليم": [header.slice()],
+    "تم التسليم":  [header.slice()],
+    "Armex":       [header.slice()]
+  };
+  let errorRows = 0;
+
+  rows.forEach((row, i) => {
+    const ch = changeMap.get(i);
+    if (!ch) return;                       // مفيش أي تعديل في الصف ده
+
+    const cells = new Array(header.length).fill(null);
+    cells[0] = row[ARMEX_MOD_CTX[0]] != null ? row[ARMEX_MOD_CTX[0]] : null;
+    cells[1] = row[ARMEX_MOD_CTX[1]] != null ? row[ARMEX_MOD_CTX[1]] : null;
+
+    let anyMappedError = false;
+    ARMEX_MOD_PAIRS.forEach(([label, olCol], pi) => {
+      const entry = ch[olCol];
+      if (!entry) return;                  // الحقل ده مفهوش تعديل في الصف ده
+      const errCol = 2 + pi * 2;           // عمود العنوان = الخطأ (قيمة Olivery القديمة)
+      const corCol = errCol + 1;           // العمود اللي بعده = الصح (الجديد من Armex)
+      cells[errCol] = aolCell(entry.old);
+      // flag = مراجعة يدوية → «الصح» فاضي · change/fill = نكتب القيمة الجديدة
+      cells[corCol] = (entry.kind === "flag") ? null : aolCell(entry.new);
+      anyMappedError = true;
+    });
+
+    if (!anyMappedError) return;
+
+    // وجّه للشيت حسب الحالة (بعد المعالجة) + شيت Armex المجمّع
+    const st = row["الحالة"] != null ? String(row["الحالة"]).trim().toLowerCase() : "";
+    const sheet = st === "delivered" ? "تم التسليم" : "تحت التسليم";
+    sheets[sheet].push(cells);
+    sheets["Armex"].push(cells.slice());
+    errorRows++;
+  });
+
+  // ابنِ الـ workbook (نفس بنية Modifications_of_AOL: RTL + دمج رؤوس + هايلايت أصفر على الصح)
+  const wb = XLSX.utils.book_new();
+  ["تحت التسليم", "تم التسليم", "Armex"].forEach(name => {
+    const ws = XLSX.utils.aoa_to_sheet(sheets[name]);
+    ws["!views"] = [{ rightToLeft: true }];
+    const merges = [];
+    ARMEX_MOD_PAIRS.forEach((_, pi) => {
+      const c0 = 2 + pi * 2;
+      merges.push({ s: { r: 0, c: c0 }, e: { r: 0, c: c0 + 1 } });
+    });
+    ws["!merges"] = merges;
+    ARMEX_MOD_PAIRS.forEach((_, pi) => {
+      const addr = XLSX.utils.encode_cell({ r: 0, c: 2 + pi * 2 });
+      if (ws[addr]) ws[addr].s = { alignment: { horizontal: "center", vertical: "center" }, font: { bold: true } };
+    });
+    ["A1", "B1"].forEach(a => { if (ws[a]) ws[a].s = { font: { bold: true }, alignment: { horizontal: "center" } }; });
+    for (let r = 1; r < sheets[name].length; r++) {
+      ARMEX_MOD_PAIRS.forEach((_, pi) => {
+        const corCol = 2 + pi * 2 + 1;
+        const errCol = 2 + pi * 2;
+        if (sheets[name][r][errCol] != null) {
+          const addr = XLSX.utils.encode_cell({ r, c: corCol });
+          if (!ws[addr]) ws[addr] = { t: "s", v: "" };
+          ws[addr].s = { fill: { patternType: "solid", fgColor: { rgb: "FEF08A" }, bgColor: { rgb: "FEF08A" } }, font: { color: { rgb: "713F12" }, bold: true } };
+        }
+      });
+    }
+    XLSX.utils.book_append_sheet(wb, ws, name);
+  });
+
+  const stamp = new Date().toISOString().slice(0, 10);
+  const fname = `Modifications_of_Armex_${stamp}.xlsx`;
+  // اكتب الملف ثم اضبط اتجاه الصفحة RTL عبر تعديل الـ XML (نفس أسلوب EGY). لو fflate مش متاحة ننزّل عادي.
+  try {
+    if (typeof fflate !== "undefined" && fflate.unzipSync) {
+      const u8 = new Uint8Array(XLSX.write(wb, { type: "array", bookType: "xlsx", cellStyles: true }));
+      const files = fflate.unzipSync(u8);
+      const dec = new TextDecoder(), enc = new TextEncoder();
+      Object.keys(files).forEach(fn => {
+        if (/^xl\/worksheets\/sheet\d+\.xml$/.test(fn)) {
+          let xml = dec.decode(files[fn]);
+          if (/<sheetView\b/.test(xml)) {
+            if (!/rightToLeft/.test(xml)) xml = xml.replace(/<sheetView\b/, '<sheetView rightToLeft="1"');
+          } else if (/<sheetViews>/.test(xml)) {
+            xml = xml.replace("<sheetViews>", '<sheetViews><sheetView rightToLeft="1" workbookViewId="0"/>');
+          } else {
+            xml = xml.replace(/(<worksheet[^>]*>)/, '$1<sheetViews><sheetView rightToLeft="1" workbookViewId="0"/></sheetViews>');
+          }
+          files[fn] = enc.encode(xml);
+        }
+      });
+      const out = fflate.zipSync(files);
+      const blob = new Blob([out], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = fname;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+    } else {
+      XLSX.writeFile(wb, fname, { cellStyles: true });
+    }
+  } catch (e) {
+    XLSX.writeFile(wb, fname, { cellStyles: true });
+  }
+  return errorRows;
 }
 
 function renderArmexSummary() {
@@ -5514,6 +5677,14 @@ $("#armexDownloadBtn").addEventListener("click", () => {
   if (!armex.result) { toast("شغّل المعالجة الأول", "error"); return; }
   try { buildArmexOutput(); armexLog("تم تنزيل ملف Olivery المعدّل", "ok"); toast("تم التنزيل", "success"); }
   catch (e) { toast("فشل التنزيل: " + e.message, "error"); console.error(e); }
+});
+$("#armexDownloadModBtn").addEventListener("click", () => {
+  if (!armex.result) { toast("شغّل المعالجة الأول", "error"); return; }
+  try {
+    const n = buildArmexModificationsReport();
+    armexLog(`تم تنزيل Modifications_of_Armex (${n} صف فيه تعديلات)`, "ok");
+    toast(n ? `تم تنزيل تقرير التعديلات (${n} صف)` : "مفيش تعديلات تتسجّل — التقرير فاضي", n ? "success" : "info");
+  } catch (e) { toast("فشل التنزيل: " + e.message, "error"); armexLog("خطأ: " + e.message, "error"); console.error(e); }
 });
 $("#armexResetBtn").addEventListener("click", () => {
   armex = { arFile:null, olFile:null, ar:null, ol:null, result:null };
