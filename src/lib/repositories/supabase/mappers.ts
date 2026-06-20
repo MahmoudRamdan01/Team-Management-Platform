@@ -64,13 +64,13 @@ export function mapAudit(r: any): AuditEntry {
     id: r.id,
     actorId: r.actor_id ?? null,
     actorUsername: r.actor_username ?? "",
-    action: r.action,
+    action: r.action ?? "admin_action",
     targetType: r.target_type ?? null,
     targetId: r.target_id ?? null,
     metadata: r.metadata ?? {},
     ip: r.ip ?? null,
     userAgent: r.user_agent ?? null,
-    createdAt: r.created_at,
+    createdAt: r.created_at ?? new Date().toISOString(),
   };
 }
 

@@ -22,6 +22,7 @@
     "save": "Save and continue"
   },
   "nav": {
+    "mainMenu": "Main menu",
     "home": "Home",
     "dashboard": "Dashboard",
     "tasks": "My Tasks",
@@ -43,7 +44,17 @@
     "toolsLive": "Live tools",
     "roleDist": "Role distribution",
     "deptDist": "Department distribution",
-    "recentActivity": "Recent activity"
+    "recentActivity": "Recent activity",
+    "noActivity": "No activity recorded yet"
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "body": "We hit an unexpected error loading this page. Try again — if it keeps happening, contact an administrator.",
+    "retry": "Try again",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The page you’re looking for doesn’t exist or may have moved.",
+    "backHome": "Back to home",
+    "ref": "ref"
   },
   "tools": {
     "title": "Tools & Workflows",

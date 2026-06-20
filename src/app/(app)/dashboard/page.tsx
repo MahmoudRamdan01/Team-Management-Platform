@@ -20,6 +20,7 @@ export default async function DashboardPage() {
   const canViewAll = ctx.permissions.has(PERMISSIONS.DASHBOARD_VIEW_ALL);
 
   const roleData = (Object.keys(stats.roleDistribution) as Role[])
+    .filter((r) => ROLE_LABELS[r])
     .map((r) => ({ label: ROLE_LABELS[r][locale], value: stats.roleDistribution[r] }))
     .filter((d) => d.value > 0);
 
@@ -54,11 +55,11 @@ export default async function DashboardPage() {
             <DistributionBar title={t("dashboard.roleDist")} data={roleData} />
           </div>
         )}
-        <div className={canViewAll ? "lg:col-span-1" : "lg:col-span-1"}>
+        <div className="lg:col-span-1">
           <DistributionBar title={t("dashboard.deptDist")} data={deptData} />
         </div>
         <div className={canViewAll ? "lg:col-span-1" : "lg:col-span-2"}>
-          <ActivityFeed entries={stats.recentActivity} title={t("dashboard.recentActivity")} />
+          <ActivityFeed entries={stats.recentActivity} title={t("dashboard.recentActivity")} emptyLabel={t("dashboard.noActivity")} />
         </div>
       </section>
     </div>

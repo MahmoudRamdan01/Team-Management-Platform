@@ -15,7 +15,15 @@ const ACTION_COLORS: Record<string, string> = {
   register: "#43D9A0",
 };
 
-export function ActivityFeed({ entries, title }: { entries: AuditEntry[]; title: string }) {
+export function ActivityFeed({
+  entries,
+  title,
+  emptyLabel = "No recent activity",
+}: {
+  entries: AuditEntry[];
+  title: string;
+  emptyLabel?: string;
+}) {
   return (
     <div className="rounded-[24px] border border-white/5 bg-[#0C1218]/50 p-6 backdrop-blur-sm transition-all hover:border-white/10 hover:bg-[#0C1218]/80 shadow-xl shadow-black/20 h-full">
       <h3 className="mb-6 font-brand text-base font-bold text-white flex items-center gap-2">
@@ -39,7 +47,7 @@ export function ActivityFeed({ entries, title }: { entries: AuditEntry[]; title:
               <div className="flex items-center justify-between gap-2">
                 <p className="truncate text-white text-sm">
                   <span className="font-bold group-hover/item:text-gold transition-colors">{e.actorUsername || "system"}</span>{" "}
-                  <span className="text-mist text-xs uppercase tracking-wider font-medium ml-1">{e.action.replace(/_/g, " ")}</span>
+                  <span className="text-mist text-xs uppercase tracking-wider font-medium ml-1">{(e.action ?? "").replace(/_/g, " ")}</span>
                 </p>
                 <span className="font-mono text-[0.65rem] text-mist/50 whitespace-nowrap">{relativeTime(e.createdAt)}</span>
               </div>
@@ -53,7 +61,7 @@ export function ActivityFeed({ entries, title }: { entries: AuditEntry[]; title:
         ))}
         {entries.length === 0 && (
           <div className="flex flex-col items-center justify-center py-10 text-mist/30 italic">
-            <p className="text-sm">لا يوجد نشاط مسجل حالياً</p>
+            <p className="text-sm">{emptyLabel}</p>
           </div>
         )}
       </ul>

@@ -7,6 +7,7 @@ import { AoiLogo } from "@/components/brand/AoiLogo";
 import { useAccess } from "@/lib/rbac/access-context";
 import { useI18n } from "@/lib/i18n/context";
 import { PERMISSIONS } from "@/lib/rbac/permissions";
+import { ROLE_LABELS } from "@/lib/rbac/roles";
 import { DEPARTMENT_MAP } from "@/lib/constants/departments";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -99,7 +100,7 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
 
         <div className="flex-1 flex flex-col gap-8 overflow-y-auto no-scrollbar">
           <div className="space-y-1">
-            <div className="px-4 mb-3 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-mist/40">القائمة الرئيسية</div>
+            <div className="px-4 mb-3 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-mist/40">{t("nav.mainMenu")}</div>
             <nav className="flex flex-col gap-1">
               {main.map((i) => (
                 <Item key={i.href} {...i} />
@@ -127,7 +128,7 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-white truncate">{profile.fullName}</div>
-                <div className="text-[0.7rem] text-mist truncate uppercase tracking-wider">{profile.role}</div>
+                <div className="text-[0.7rem] text-mist truncate uppercase tracking-wider">{ROLE_LABELS[profile.role]?.[locale] ?? profile.role}</div>
               </div>
             </div>
           </div>
