@@ -37,7 +37,7 @@ export default async function AuditPage({
           <h1 className="font-brand text-2xl font-bold text-foam sm:text-3xl">{t("admin.auditTitle")}</h1>
           <p className="mt-1 font-mono text-xs text-mist">{result.total} entries</p>
         </div>
-        <Suspense>
+        <Suspense fallback={<div className="h-10 w-44 animate-pulse rounded-xl bg-white/5" />}>
           <AuditFilters />
         </Suspense>
       </header>

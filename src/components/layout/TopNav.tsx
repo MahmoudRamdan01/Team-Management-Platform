@@ -60,7 +60,7 @@ export function TopNav({ onlineCount, onBurger }: { onlineCount: number; onBurge
           <div className="text-end">
             <div className="text-sm font-bold text-white leading-none">{profile.fullName}</div>
             <div className="mt-1 font-mono text-[0.6rem] tracking-wider text-gold/80 uppercase">
-              {dept?.code} · {ROLE_LABELS[profile.role][locale]}
+              {dept?.code} · {ROLE_LABELS[profile.role]?.[locale] ?? profile.role}
             </div>
           </div>
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold/20 to-gold/5 border border-gold/20 flex items-center justify-center text-gold">
