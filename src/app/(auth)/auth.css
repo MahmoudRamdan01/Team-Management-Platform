@@ -1,150 +1,148 @@
 /* ============================================================================
-   Login — hand-drawn cinematic freight scene (air · ocean · land) rendered as
-   an animated SVG (see LoginScene.tsx). Pure CSS animation, no external image,
-   fully disabled under prefers-reduced-motion.
+   Login cinemagraph — subtle animated light layers over the cropped Air Ocean
+   Line hero scene (public/images/login-scene.png). The photo already carries
+   the detail; these layers just make it breathe. Reduced-motion safe.
    ========================================================================== */
 
 .ls-scene {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #070e18;
+  background: #0a1422;
 }
-.ls-svg {
+
+/* hero photo + slow ken-burns */
+.ls-photo {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
+  inset: -3%;
+  background: url("/images/login-scene.png") center center / cover no-repeat;
+  animation: ls-kenburns 34s ease-in-out infinite alternate;
+}
+@keyframes ls-kenburns {
+  from { transform: scale(1) translate(0, 0); }
+  to { transform: scale(1.07) translate(-1.2%, -1%); }
 }
 
-/* stars */
-.sc-star {
-  animation: sc-twinkle 4s ease-in-out infinite;
+/* sky star twinkle (subtle, additive) */
+.ls-stars {
+  position: absolute;
+  inset: 0 0 60% 0;
+  mix-blend-mode: screen;
+  background-image:
+    radial-gradient(1px 1px at 30% 22%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 62% 14%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 48% 30%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1.4px 1.4px at 78% 20%, rgba(255, 235, 170, 0.6), transparent),
+    radial-gradient(1px 1px at 18% 16%, rgba(255, 255, 255, 0.6), transparent);
+  animation: ls-twinkle 5s ease-in-out infinite;
 }
-.sc-star:nth-child(3n) { animation-duration: 5.5s; animation-delay: 0.6s; }
-.sc-star:nth-child(3n + 1) { animation-duration: 3.4s; animation-delay: 1.2s; }
-@keyframes sc-twinkle {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 0.9; }
+@keyframes ls-twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
 }
 
-/* lighthouse beam + lamp */
-.sc-beam {
-  transform-box: fill-box;
+/* lighthouse beam shimmer (upper-left) */
+.ls-beam {
+  position: absolute;
+  left: 9%;
+  top: 25%;
+  width: 48%;
+  height: 10%;
   transform-origin: 0% 50%;
   mix-blend-mode: screen;
-  animation: sc-beam 7s ease-in-out infinite;
+  filter: blur(8px);
+  background: linear-gradient(90deg, rgba(255, 236, 175, 0.4), rgba(255, 236, 175, 0.05) 55%, transparent 80%);
+  animation: ls-beam 8s ease-in-out infinite;
 }
-@keyframes sc-beam {
-  0%, 100% { transform: rotate(-17deg); opacity: 0.3; }
-  48% { transform: rotate(8deg); opacity: 0.85; }
-}
-.sc-lamp {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: sc-pulse 2.6s ease-in-out infinite;
-}
-@keyframes sc-pulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
+@keyframes ls-beam {
+  0%, 100% { transform: rotate(-4deg); opacity: 0.22; }
+  50% { transform: rotate(4deg); opacity: 0.5; }
 }
 
-/* plane drift + blinking navigation lights */
-.sc-plane {
-  animation: sc-plane 18s ease-in-out infinite;
+/* water shimmer (lower-left) */
+.ls-water {
+  position: absolute;
+  left: 0;
+  right: 30%;
+  top: 63%;
+  bottom: 6%;
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  background:
+    repeating-linear-gradient(93deg, rgba(247, 183, 51, 0) 0 12px, rgba(247, 183, 51, 0.06) 13px, rgba(247, 183, 51, 0) 20px),
+    repeating-linear-gradient(88deg, rgba(255, 255, 255, 0) 0 16px, rgba(255, 255, 255, 0.045) 17px, rgba(255, 255, 255, 0) 26px);
+  animation: ls-water 10s linear infinite;
 }
-@keyframes sc-plane {
-  0% { transform: translate(0, 0); }
-  50% { transform: translate(30px, -10px); }
-  100% { transform: translate(0, 0); }
-}
-.sc-nav-r { animation: sc-blink 1.5s steps(1, end) infinite; }
-.sc-nav-l { animation: sc-blink 1.5s steps(1, end) infinite; animation-delay: 0.75s; }
-@keyframes sc-blink {
-  0%, 45% { opacity: 1; }
-  46%, 100% { opacity: 0.1; }
-}
-
-/* ship gentle bob */
-.sc-ship {
-  animation: sc-bob 6s ease-in-out infinite;
-}
-@keyframes sc-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(3px); }
+@keyframes ls-water {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 120px 0, -80px 0; }
 }
 
-/* water shimmer / reflections */
-.sc-shimmer {
-  transform-box: fill-box;
-  animation: sc-shimmer 5s ease-in-out infinite;
+/* truck headlight + travelling road light (lower-centre) */
+.ls-truck {
+  position: absolute;
+  left: 40%;
+  bottom: 22%;
+  width: 72px;
+  height: 26px;
+  mix-blend-mode: screen;
+  background: radial-gradient(closest-side, rgba(255, 220, 150, 0.5), transparent 75%);
+  animation: ls-pulse 2.6s ease-in-out infinite;
 }
-.sc-shimmer:nth-child(2n) { animation-duration: 6.5s; animation-delay: 0.8s; }
-.sc-shimmer:nth-child(3n) { animation-duration: 4.2s; animation-delay: 1.4s; }
-@keyframes sc-shimmer {
-  0%, 100% { opacity: 0.18; transform: scaleX(0.9); }
-  50% { opacity: 0.6; transform: scaleX(1.08); }
+@keyframes ls-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.8; }
+}
+.ls-road {
+  position: absolute;
+  left: 30%;
+  bottom: 14%;
+  width: 34%;
+  height: 3px;
+  transform: rotate(6deg);
+  mix-blend-mode: screen;
+  filter: blur(1px);
+  background: linear-gradient(90deg, transparent, rgba(247, 183, 51, 0.6), transparent);
+  animation: ls-road 3.6s linear infinite;
+}
+@keyframes ls-road {
+  0% { transform: rotate(6deg) translateX(-40%); opacity: 0; }
+  25% { opacity: 0.7; }
+  100% { transform: rotate(6deg) translateX(60%); opacity: 0; }
 }
 
-/* port lights flicker */
-.sc-plight {
-  animation: sc-flicker 3s ease-in-out infinite;
-}
-.sc-plight:nth-child(2n) { animation-delay: 0.7s; animation-duration: 2.2s; }
-.sc-plight:nth-child(3n) { animation-delay: 1.3s; animation-duration: 3.6s; }
-@keyframes sc-flicker {
-  0%, 100% { opacity: 0.4; }
-  40% { opacity: 1; }
-  70% { opacity: 0.55; }
-}
-
-/* road glow flowing along the curve */
-.sc-roadflow {
-  stroke-dasharray: 26 26;
-  animation: sc-roadflow 1.6s linear infinite;
-}
-@keyframes sc-roadflow {
-  to { stroke-dashoffset: -52; }
-}
-
-/* truck wheels + headlight */
-.sc-wheel {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: sc-spin 0.6s linear infinite;
-}
-@keyframes sc-spin {
-  to { transform: rotate(360deg); }
-}
-.sc-head {
-  animation: sc-pulse 2.2s ease-in-out infinite;
+.ls-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 13, 21, 0.2) 0%, transparent 30%, rgba(7, 13, 21, 0.4) 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sc-star, .sc-beam, .sc-lamp, .sc-plane, .sc-nav-r, .sc-nav-l, .sc-ship,
-  .sc-shimmer, .sc-plight, .sc-roadflow, .sc-wheel, .sc-head {
+  .ls-photo, .ls-stars, .ls-beam, .ls-water, .ls-truck, .ls-road {
     animation: none !important;
   }
 }
 
-/* ---- Form panel: dimmed glass on mobile, solid with a diagonal gold edge on desktop ---- */
+/* ---- Form panel: dimmed scene on mobile, solid with a gold edge on desktop ---- */
 .ls-form-panel {
-  background: rgba(9, 15, 23, 0.74);
-  backdrop-filter: blur(10px);
+  background:
+    linear-gradient(rgba(7, 13, 21, 0.88), rgba(7, 13, 21, 0.93)),
+    url("/images/login-scene.png") center / cover no-repeat;
+  backdrop-filter: blur(2px);
 }
 @media (min-width: 768px) {
   .ls-form-panel {
-    background: linear-gradient(100deg, rgba(9, 15, 23, 0.55) 0%, rgba(9, 15, 23, 0.97) 15%, #0a111a 30%);
-    backdrop-filter: blur(14px);
+    background: #0a111a;
+    backdrop-filter: none;
   }
   .ls-form-panel::before {
     content: "";
     position: absolute;
-    inset: 0 auto 0 4%;
+    top: 0;
+    bottom: 0;
+    left: -1px;
     width: 2px;
-    transform: skewX(-6deg);
-    transform-origin: top;
-    background: linear-gradient(180deg, transparent, rgba(247, 183, 51, 0.65) 25%, rgba(247, 183, 51, 0.65) 75%, transparent);
+    transform: skewX(-5deg);
+    background: linear-gradient(180deg, transparent, rgba(247, 183, 51, 0.6) 25%, rgba(247, 183, 51, 0.6) 75%, transparent);
   }
 }
