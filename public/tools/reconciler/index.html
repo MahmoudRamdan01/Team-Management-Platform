@@ -1356,6 +1356,46 @@ body.pricing-locked .locked-hide { display: none !important; }
       </div>
     </div>
   </section>
+
+    <!-- SMSA SECTION 6: EXTRACT ALL AWB NUMBERS FROM PDF -->
+    <section class="section" id="smsaAwbSection">
+      <div class="section-header" data-toggle="smsaAwbSection">
+        <div class="section-title-row">
+          <span class="section-num">06</span>
+          <h2 class="section-title">استخراج أرقام البوالص (AWB) من PDF</h2>
+        </div>
+        <span class="section-subtitle">— يطلّع كل أرقام SMSA من ملف PDF</span>
+        <span class="status-pill" id="smsaAwbPill"><span class="dot"></span> Idle</span>
+        <svg class="section-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+      <div class="section-body">
+        <p class="hygiene-intro locked-hide">
+          ارفع <strong>ملف SMSA (PDF)</strong> والتول هتطلّع <strong>كل أرقام البوالص (AWB)</strong>
+          الموجودة فيه بترتيب ظهورها (مع الإبقاء على المكرّر)، تعرضها هنا مع العدد، وتقدر تنزّلها Excel.
+        </p>
+        <div class="upload-grid">
+          <label class="dropzone" id="smsaAwbDrop">
+            <input type="file" id="smsaAwbInput" accept=".pdf,.PDF">
+            <div class="dropzone-icon">📄</div>
+            <div class="dropzone-title">ملف SMSA (PDF)</div>
+            <div class="dropzone-hint">اسحب أو اضغط للاختيار</div>
+            <div class="dropzone-file" id="smsaAwbName"></div>
+          </label>
+        </div>
+        <div class="btn-row" style="margin-top:18px;">
+          <button class="btn btn-primary" id="smsaAwbDownloadBtn" disabled>
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10"/></svg>
+            ⬇ تنزيل Excel
+          </button>
+          <button class="btn btn-ghost" id="smsaAwbResetBtn">إعادة تعيين</button>
+        </div>
+        <div class="helper" id="smsaAwbCount" style="margin-top:14px;"></div>
+        <div class="preview-table-scroll" style="margin-top:10px;">
+          <table class="preview-table" id="smsaAwbTable"></table>
+        </div>
+      </div>
+    </section>
+
   </div><!-- /smsaTab -->
 
   <!-- ========== EGY TAB ========== -->
@@ -1800,6 +1840,45 @@ body.pricing-locked .locked-hide { display: none !important; }
           </button>
         </div>
         <div class="log-panel" id="armexF2Log" style="margin-top:16px;"></div>
+      </div>
+    </section>
+
+    <!-- ARMEX SECTION 5: EXTRACT ALL AWB NUMBERS FROM PDF -->
+    <section class="section" id="armexAwbSection">
+      <div class="section-header" data-toggle="armexAwbSection">
+        <div class="section-title-row">
+          <span class="section-num">05</span>
+          <h2 class="section-title">استخراج أرقام البوالص (AWB) من PDF</h2>
+        </div>
+        <span class="section-subtitle">— يطلّع كل أرقام Armex من فاتورة PDF</span>
+        <span class="status-pill" id="armexAwbPill"><span class="dot"></span> Idle</span>
+        <svg class="section-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l4 4-4 4"/></svg>
+      </div>
+      <div class="section-body">
+        <p class="hygiene-intro locked-hide">
+          ارفع <strong>فاتورة Armex (PDF)</strong> والتول هتطلّع <strong>كل أرقام البوالص (HAWB)</strong>
+          الموجودة فيها بترتيب ظهورها (مع الإبقاء على المكرّر)، تعرضها هنا مع العدد، وتقدر تنزّلها Excel.
+        </p>
+        <div class="upload-grid">
+          <label class="dropzone" id="armexAwbDrop">
+            <input type="file" id="armexAwbInput" accept=".pdf,.PDF">
+            <div class="dropzone-icon">📄</div>
+            <div class="dropzone-title">فاتورة Armex (PDF)</div>
+            <div class="dropzone-hint">اسحب أو اضغط للاختيار</div>
+            <div class="dropzone-file" id="armexAwbName"></div>
+          </label>
+        </div>
+        <div class="btn-row" style="margin-top:18px;">
+          <button class="btn btn-primary" id="armexAwbDownloadBtn" disabled>
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9m0 0l-3-3m3 3l3-3M3 13h10"/></svg>
+            ⬇ تنزيل Excel
+          </button>
+          <button class="btn btn-ghost" id="armexAwbResetBtn">إعادة تعيين</button>
+        </div>
+        <div class="helper" id="armexAwbCount" style="margin-top:14px;"></div>
+        <div class="preview-table-scroll" style="margin-top:10px;">
+          <table class="preview-table" id="armexAwbTable"></table>
+        </div>
       </div>
     </section>
 
@@ -2587,6 +2666,81 @@ function refreshUploadPill() {
     pill.className = "status-pill pending";
     text.textContent = "Waiting for files";
   }
+}
+
+/* =================================================================== *
+ *  AWB EXTRACTOR (shared)                                              *
+ *  Pulls every AWB / tracking number out of a shipping-company PDF in  *
+ *  reading order, keeping duplicates. Powers the Armex & SMSA "extract *
+ *  AWB numbers" sections. Reuses the same PDF.js text-layout approach  *
+ *  as parseSmsaPdf / armexF2ParsePdf.                                  *
+ * =================================================================== */
+// Read a PDF into visual rows: array of rows, each an array of {str,x,y}
+// tokens, ordered top→bottom then left→right (Y threshold = 4px).
+async function pdfToVisualRows(file) {
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const visualRows = [];
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p);
+    const content = await page.getTextContent();
+    const items = content.items
+      .map(it => ({ str: it.str, x: it.transform[4], y: it.transform[5] }))
+      .filter(i => i.str && i.str.trim());
+    items.sort((a, b) => (b.y - a.y) || (a.x - b.x));
+    let curY = null, row = [];
+    for (const it of items) {
+      if (curY == null || Math.abs(it.y - curY) > 4) { if (row.length) visualRows.push(row); row = []; curY = it.y; }
+      row.push(it);
+    }
+    if (row.length) visualRows.push(row);
+  }
+  return visualRows;
+}
+
+// Collect every AWB token in reading order (duplicates kept).
+//   mode "smsa"  → tokens of 10–14 digits starting with "291"
+//   mode "armex" → 11-digit HAWB read from the invoice HAWB column (x range)
+function extractAwbList(visualRows, mode) {
+  const out = [];
+  if (mode === "armex") {
+    const [x0, x1] = (typeof ARMEX_PDF_COLS !== "undefined" && ARMEX_PDF_COLS.hawb) || [40, 110];
+    for (const row of visualRows) {
+      const hawb = row.filter(it => it.x >= x0 && it.x < x1)
+        .sort((a, b) => a.x - b.x).map(it => it.str).join(" ")
+        .replace(/\s+/g, "").trim();
+      if (/^\d{11}$/.test(hawb)) out.push(hawb);
+    }
+  } else { // smsa
+    for (const row of visualRows) {
+      const tokens = row.flatMap(it => String(it.str).split(/\s+/)).filter(Boolean);
+      for (const t of tokens) {
+        if (/^\d{10,14}$/.test(t) && t.startsWith("291")) out.push(t);
+      }
+    }
+  }
+  return out;
+}
+
+// Render extracted numbers into a <table> (cols: #, AWB) + a count line.
+function renderAwbList(tableEl, countEl, list) {
+  if (countEl) {
+    const uniq = new Set(list).size;
+    const dupNote = list.length !== uniq ? ` · ${list.length - uniq} مكرّر` : "";
+    countEl.textContent = list.length ? `إجمالي ${list.length} رقم${dupNote}` : "لم يتم العثور على أرقام";
+  }
+  if (!tableEl) return;
+  if (!list.length) { tableEl.innerHTML = "<thead><tr><th>#</th><th>AWB</th></tr></thead>"; return; }
+  const body = list.map((awb, i) => `<tr><td>${i + 1}</td><td>${awb}</td></tr>`).join("");
+  tableEl.innerHTML = `<thead><tr><th style="width:64px;">#</th><th>AWB</th></tr></thead><tbody>${body}</tbody>`;
+}
+
+// Download the list as a one-sheet workbook (cols: #, AWB). AWBs stay text.
+function exportAwbExcel(list, company) {
+  const aoa = [["#", "AWB"]].concat(list.map((awb, i) => [i + 1, String(awb)]));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), "AWB");
+  XLSX.writeFile(wb, `${company}_AWB_${stampNow()}.xlsx`);
 }
 
 /* =================================================================== *
@@ -6020,6 +6174,62 @@ $("#armexF2ResetBtn").addEventListener("click", () => {
 });
 
 
+
+/* =================================================================== *
+ *  AWB EXTRACTOR — UI WIRING (Armex + SMSA sections)                  *
+ *  Auto-extracts every AWB number on upload, shows them + a count,    *
+ *  and enables the Excel download. Pure client-side, additive.        *
+ * =================================================================== */
+function wireAwbSection(sel, mode, company) {
+  let list = [];
+  const setPill = (cls, txt) => {
+    $(sel.pill).className = "status-pill" + (cls ? " " + cls : "");
+    $(sel.pill).innerHTML = `<span class="dot"></span> ${txt}`;
+  };
+  wireDropzone($(sel.drop), $(sel.input), async (file) => {
+    if (!/\.pdf$/i.test(file.name)) { toast("لازم ملف PDF", "error"); return; }
+    $(sel.name).textContent = `${file.name} · ${(file.size / 1024).toFixed(1)} KB`;
+    $(sel.drop).classList.add("loaded");
+    setPill("pending", "جارٍ القراءة…");
+    try {
+      const rows = await pdfToVisualRows(file);
+      list = extractAwbList(rows, mode);
+      renderAwbList($(sel.table), $(sel.count), list);
+      $(sel.download).disabled = list.length === 0;
+      if (list.length) { setPill("ok", `${list.length} رقم`); toast(`تم استخراج ${list.length} رقم`, "success"); }
+      else { setPill("warn", "لا توجد أرقام"); toast("لم يتم العثور على أرقام في الـ PDF", "error"); }
+    } catch (e) {
+      console.error(e);
+      list = []; $(sel.download).disabled = true;
+      setPill("warn", "خطأ");
+      toast("فشل قراءة الـ PDF: " + e.message, "error");
+    }
+  });
+  $(sel.download).addEventListener("click", () => {
+    if (!list.length) { toast("ارفع PDF فيه أرقام الأول", "error"); return; }
+    try { exportAwbExcel(list, company); toast("تم التنزيل", "success"); }
+    catch (e) { toast("فشل التنزيل: " + e.message, "error"); console.error(e); }
+  });
+  $(sel.reset).addEventListener("click", () => {
+    list = [];
+    $(sel.input).value = ""; $(sel.name).textContent = "";
+    $(sel.drop).classList.remove("loaded");
+    $(sel.table).innerHTML = ""; $(sel.count).textContent = "";
+    $(sel.download).disabled = true;
+    setPill("", "Idle");
+    toast("تم إعادة التعيين", "info");
+  });
+}
+
+wireAwbSection({
+  drop: "#armexAwbDrop", input: "#armexAwbInput", name: "#armexAwbName", pill: "#armexAwbPill",
+  count: "#armexAwbCount", table: "#armexAwbTable", download: "#armexAwbDownloadBtn", reset: "#armexAwbResetBtn"
+}, "armex", "Armex");
+
+wireAwbSection({
+  drop: "#smsaAwbDrop", input: "#smsaAwbInput", name: "#smsaAwbName", pill: "#smsaAwbPill",
+  count: "#smsaAwbCount", table: "#smsaAwbTable", download: "#smsaAwbDownloadBtn", reset: "#smsaAwbResetBtn"
+}, "smsa", "SMSA");
 
 /* =================================================================== *
  *  ARMEX PRICING & ZONES UI                                            *
