@@ -4,10 +4,14 @@ import { getServerI18n } from "@/lib/i18n/server";
 import "./auth.css";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const { t } = getServerI18n();
+  const { locale, t } = getServerI18n();
+  const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden bg-[#070d15] font-sans">
+    // Lock the split to LTR so the scene stays on the left and the form on the
+    // right (matching the mockup) in every language; the form text itself still
+    // follows the active locale's direction.
+    <main dir="ltr" className="relative min-h-screen w-full overflow-hidden bg-[#070d15] font-sans">
       {/* full-bleed cinematic scene (also serves as the dimmed mobile backdrop) */}
       <div className="absolute inset-0">
         <LoginScene />
@@ -27,7 +31,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
         {/* ---- Form panel ---- */}
         <div className="ls-form-panel relative flex items-center justify-center px-6 py-12 sm:px-10">
-          <div className="relative z-10 w-full max-w-sm">{children}</div>
+          <div dir={dir} className="relative z-10 w-full max-w-sm">
+            {children}
+          </div>
         </div>
       </div>
     </main>
