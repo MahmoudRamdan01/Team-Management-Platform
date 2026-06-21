@@ -18,8 +18,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         {/* ---- Form panel (also dimmed-scene backdrop on mobile) ---- */}
-        <div className="ls-form-panel relative flex items-center justify-center px-6 py-12 sm:px-10">
-          <div dir={dir} className="relative z-10 w-full max-w-sm">
+        <div className="ls-form-panel relative flex items-center justify-center overflow-y-auto px-6 py-10 sm:px-10">
+          <div dir={dir} className="relative z-10 w-full max-w-[26rem]">
             {children}
           </div>
         </div>

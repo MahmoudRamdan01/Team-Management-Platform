@@ -40,7 +40,16 @@
     "resetDone": "Your password has been updated — you can sign in now.",
     "resetInvalid": "This reset link is invalid or has expired. Request a new one.",
     "pwdShort": "Password must be at least 8 characters.",
-    "pwdMismatch": "Passwords do not match."
+    "pwdMismatch": "Passwords do not match.",
+    "airFreight": "Air Freight",
+    "airFreightSub": "Fast. Reliable.",
+    "oceanFreight": "Ocean Freight",
+    "oceanFreightSub": "Global. Efficient.",
+    "domestic": "Domestic",
+    "domesticSub": "Everywhere.",
+    "requestAccess": "Request Account Access",
+    "secureLine": "Secure. Reliable. Always Connected.",
+    "secureSub": "Your cargo. Our commitment."
   },
   "nav": {
     "mainMenu": "Main menu",

@@ -3,12 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, Loader2, Lock, Mail, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, User, ArrowRight, Plane, Ship, Truck, ShieldCheck, ChevronRight, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AoiLogo } from "@/components/brand/AoiLogo";
 import { useI18n } from "@/lib/i18n/context";
-
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@airocean.com";
 
 export function LoginForm() {
   const router = useRouter();
@@ -44,6 +41,12 @@ export function LoginForm() {
     }
   }
 
+  const modes = [
+    { icon: Plane, title: t("auth.airFreight"), sub: t("auth.airFreightSub") },
+    { icon: Ship, title: t("auth.oceanFreight"), sub: t("auth.oceanFreightSub") },
+    { icon: Truck, title: t("auth.domestic"), sub: t("auth.domesticSub") },
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
@@ -52,13 +55,26 @@ export function LoginForm() {
       className="flex flex-col"
     >
       {/* ---- Brand ---- */}
-      <div className="mb-8 flex flex-col items-center text-center">
-        <AoiLogo size="lg" />
-        <h1 className="mt-4 font-brand text-2xl font-bold uppercase tracking-[0.18em] text-white sm:text-3xl">
+      <div className="mb-6 flex flex-col items-center text-center">
+        <div className="font-brand text-4xl font-black tracking-wide text-gold drop-shadow-[0_0_18px_rgba(247,183,51,0.35)]">
+          AOI<span className="text-gold">.</span>
+        </div>
+        <h1 className="mt-2 font-brand text-2xl font-bold uppercase tracking-[0.18em] text-white sm:text-[1.7rem]">
           {t("auth.brandName")}
         </h1>
         <span className="mt-3 h-0.5 w-12 rounded-full bg-gold" />
         <p className="mt-3 text-sm font-medium text-gold/90">{t("auth.tagline")}</p>
+      </div>
+
+      {/* ---- Freight-mode chips ---- */}
+      <div className="mb-6 grid grid-cols-3 gap-2">
+        {modes.map(({ icon: Icon, title, sub }) => (
+          <div key={title} className="flex flex-col items-center gap-1 rounded-xl border border-white/5 bg-white/[0.03] px-1 py-3 text-center">
+            <Icon size={18} className="text-gold" />
+            <span className="text-[0.68rem] font-bold leading-tight text-white">{title}</span>
+            <span className="text-[0.58rem] leading-tight text-mist/70">{sub}</span>
+          </div>
+        ))}
       </div>
 
       <AnimatePresence mode="wait">
@@ -77,16 +93,13 @@ export function LoginForm() {
         )}
       </AnimatePresence>
 
-      <form onSubmit={onSubmit} className="space-y-5" autoComplete="on">
+      <form onSubmit={onSubmit} className="space-y-4" autoComplete="on">
         <div className="group">
           <label className="mb-1.5 block text-[0.7rem] font-semibold uppercase tracking-[0.15em] text-mist transition-colors group-focus-within:text-gold">
             {t("auth.email")}
           </label>
           <div className="relative">
-            <Mail
-              className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-mist transition-colors group-focus-within:text-gold"
-              size={18}
-            />
+            <User className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-mist transition-colors group-focus-within:text-gold" size={18} />
             <input
               className="input ps-11"
               type="text"
@@ -104,10 +117,7 @@ export function LoginForm() {
             {t("auth.password")}
           </label>
           <div className="relative">
-            <Lock
-              className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-mist transition-colors group-focus-within:text-gold"
-              size={18}
-            />
+            <Lock className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-mist transition-colors group-focus-within:text-gold" size={18} />
             <input
               className="input ps-11 pe-12"
               type={show ? "text" : "password"}
@@ -127,10 +137,7 @@ export function LoginForm() {
             </button>
           </div>
           <div className="mt-2 flex justify-end">
-            <Link
-              href="/forgot-password"
-              className="text-xs font-medium text-gold/90 transition-colors hover:text-gold hover:underline underline-offset-4"
-            >
+            <Link href="/forgot-password" className="text-xs font-medium text-gold/90 underline-offset-4 transition-colors hover:text-gold hover:underline">
               {t("auth.forgotPassword")}
             </Link>
           </div>
@@ -154,23 +161,28 @@ export function LoginForm() {
         </motion.button>
       </form>
 
-      <div className="my-6 flex items-center gap-4">
+      <div className="my-5 flex items-center gap-4">
         <span className="h-px flex-1 bg-white/10" />
         <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-mist/60">{t("auth.or")}</span>
         <span className="h-px flex-1 bg-white/10" />
       </div>
 
-      <a
-        href={`mailto:${ADMIN_EMAIL}`}
-        className="block text-center text-sm font-medium text-mist transition-colors hover:text-gold"
+      <Link
+        href="/register"
+        className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-foam transition-all duration-300 hover:border-gold/60 hover:bg-white/[0.08] hover:text-white"
       >
-        {t("auth.contactAdmin")}
-      </a>
+        <UserPlus size={16} className="text-gold" />
+        {t("auth.requestAccess")}
+        <ChevronRight size={15} className="text-mist rtl:rotate-180" />
+      </Link>
 
-      {/* mobile-only modes line */}
-      <div className="mt-8 flex items-center justify-center gap-3 font-mono text-[0.6rem] uppercase tracking-[0.18em] text-mist/50 md:hidden">
-        <span className="h-px w-6 bg-gold/50" />
-        {t("auth.modesLine")}
+      {/* ---- Trust footer ---- */}
+      <div className="mt-7 flex items-start justify-center gap-2 text-center">
+        <ShieldCheck size={16} className="mt-0.5 shrink-0 text-gold" />
+        <div className="text-xs leading-relaxed">
+          <span className="font-medium text-foam">{t("auth.secureLine")}</span>{" "}
+          <span className="text-mist/70">{t("auth.secureSub")}</span>
+        </div>
       </div>
     </motion.div>
   );

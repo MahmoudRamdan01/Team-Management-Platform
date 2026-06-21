@@ -1,7 +1,9 @@
 /* ============================================================================
-   Login cinemagraph — subtle animated light layers over the cropped Air Ocean
-   Line hero scene (public/images/login-scene.png). The photo already carries
-   the detail; these layers just make it breathe. Reduced-motion safe.
+   Login cinemagraph — clearly visible animated light layers over the cropped
+   Air Ocean Line hero scene (public/images/login-scene.png): ken-burns drift,
+   twinkling stars, a sweeping lighthouse beam, shimmering water, light trails
+   running up the coastal road, and an occasional shooting star.
+   Reduced-motion safe.
    ========================================================================== */
 
 .ls-scene {
@@ -11,119 +13,144 @@
   background: #0a1422;
 }
 
-/* hero photo + slow ken-burns */
+/* hero photo + ken-burns */
 .ls-photo {
   position: absolute;
-  inset: -3%;
+  inset: -4%;
   background: url("/images/login-scene.png") center center / cover no-repeat;
-  animation: ls-kenburns 34s ease-in-out infinite alternate;
+  animation: ls-kenburns 24s ease-in-out infinite alternate;
 }
 @keyframes ls-kenburns {
   from { transform: scale(1) translate(0, 0); }
-  to { transform: scale(1.07) translate(-1.2%, -1%); }
+  to { transform: scale(1.09) translate(-2%, -1.4%); }
 }
 
-/* sky star twinkle (subtle, additive) */
+/* sky star twinkle */
 .ls-stars {
   position: absolute;
-  inset: 0 0 60% 0;
+  inset: 0 0 58% 0;
   mix-blend-mode: screen;
   background-image:
-    radial-gradient(1px 1px at 30% 22%, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 1px at 62% 14%, rgba(255, 255, 255, 0.7), transparent),
-    radial-gradient(1px 1px at 48% 30%, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1.4px 1.4px at 78% 20%, rgba(255, 235, 170, 0.6), transparent),
-    radial-gradient(1px 1px at 18% 16%, rgba(255, 255, 255, 0.6), transparent);
-  animation: ls-twinkle 5s ease-in-out infinite;
+    radial-gradient(1.2px 1.2px at 30% 22%, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1.2px 1.2px at 62% 14%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 48% 30%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1.6px 1.6px at 78% 18%, rgba(255, 235, 170, 0.7), transparent),
+    radial-gradient(1px 1px at 18% 16%, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1.2px 1.2px at 88% 28%, rgba(255, 255, 255, 0.6), transparent);
+  animation: ls-twinkle 4s ease-in-out infinite;
 }
 @keyframes ls-twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.95; }
+}
+
+/* lighthouse beam sweep */
+.ls-beam {
+  position: absolute;
+  left: 9%;
+  top: 24%;
+  width: 50%;
+  height: 11%;
+  transform-origin: 0% 50%;
+  mix-blend-mode: screen;
+  filter: blur(7px);
+  background: linear-gradient(90deg, rgba(255, 236, 175, 0.55), rgba(255, 236, 175, 0.08) 55%, transparent 80%);
+  animation: ls-beam 7s ease-in-out infinite;
+}
+@keyframes ls-beam {
+  0%, 100% { transform: rotate(-7deg); opacity: 0.3; }
+  50% { transform: rotate(6deg); opacity: 0.7; }
+}
+
+/* water shimmer */
+.ls-water {
+  position: absolute;
+  left: 0;
+  right: 26%;
+  top: 62%;
+  bottom: 5%;
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  background:
+    repeating-linear-gradient(93deg, rgba(247, 183, 51, 0) 0 11px, rgba(247, 183, 51, 0.09) 12px, rgba(247, 183, 51, 0) 18px),
+    repeating-linear-gradient(87deg, rgba(255, 255, 255, 0) 0 15px, rgba(255, 255, 255, 0.07) 16px, rgba(255, 255, 255, 0) 24px);
+  animation: ls-water 7s linear infinite;
+}
+@keyframes ls-water {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 140px 0, -100px 0; }
+}
+
+/* light trails running up the coastal road (lower-centre) */
+.ls-trail {
+  position: absolute;
+  left: 42%;
+  bottom: 7%;
+  width: 64px;
+  height: 4px;
+  border-radius: 4px;
+  mix-blend-mode: screen;
+  filter: blur(1px);
+  background: linear-gradient(90deg, transparent, rgba(255, 214, 130, 0.95), transparent);
+  animation: ls-trail 2.8s linear infinite;
+}
+@keyframes ls-trail {
+  0% { transform: translate(0, 0) rotate(-50deg) scaleX(0.5); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: translate(150px, -150px) rotate(-50deg) scaleX(1.1); opacity: 0; }
+}
+
+/* truck headlight pulse */
+.ls-truck {
+  position: absolute;
+  left: 39%;
+  bottom: 23%;
+  width: 76px;
+  height: 28px;
+  mix-blend-mode: screen;
+  background: radial-gradient(closest-side, rgba(255, 220, 150, 0.55), transparent 75%);
+  animation: ls-pulse 2.4s ease-in-out infinite;
+}
+@keyframes ls-pulse {
   0%, 100% { opacity: 0.35; }
   50% { opacity: 0.85; }
 }
 
-/* lighthouse beam shimmer (upper-left) */
-.ls-beam {
+/* occasional shooting star */
+.ls-meteor {
   position: absolute;
-  left: 9%;
-  top: 25%;
-  width: 48%;
-  height: 10%;
-  transform-origin: 0% 50%;
+  left: 60%;
+  top: 9%;
+  width: 100px;
+  height: 2px;
+  border-radius: 2px;
   mix-blend-mode: screen;
-  filter: blur(8px);
-  background: linear-gradient(90deg, rgba(255, 236, 175, 0.4), rgba(255, 236, 175, 0.05) 55%, transparent 80%);
-  animation: ls-beam 8s ease-in-out infinite;
+  filter: blur(0.5px);
+  background: linear-gradient(270deg, rgba(255, 255, 255, 0.95), transparent);
+  transform: rotate(22deg);
+  opacity: 0;
+  animation: ls-meteor 8s ease-in infinite;
 }
-@keyframes ls-beam {
-  0%, 100% { transform: rotate(-4deg); opacity: 0.22; }
-  50% { transform: rotate(4deg); opacity: 0.5; }
-}
-
-/* water shimmer (lower-left) */
-.ls-water {
-  position: absolute;
-  left: 0;
-  right: 30%;
-  top: 63%;
-  bottom: 6%;
-  mix-blend-mode: screen;
-  opacity: 0.5;
-  background:
-    repeating-linear-gradient(93deg, rgba(247, 183, 51, 0) 0 12px, rgba(247, 183, 51, 0.06) 13px, rgba(247, 183, 51, 0) 20px),
-    repeating-linear-gradient(88deg, rgba(255, 255, 255, 0) 0 16px, rgba(255, 255, 255, 0.045) 17px, rgba(255, 255, 255, 0) 26px);
-  animation: ls-water 10s linear infinite;
-}
-@keyframes ls-water {
-  from { background-position: 0 0, 0 0; }
-  to { background-position: 120px 0, -80px 0; }
-}
-
-/* truck headlight + travelling road light (lower-centre) */
-.ls-truck {
-  position: absolute;
-  left: 40%;
-  bottom: 22%;
-  width: 72px;
-  height: 26px;
-  mix-blend-mode: screen;
-  background: radial-gradient(closest-side, rgba(255, 220, 150, 0.5), transparent 75%);
-  animation: ls-pulse 2.6s ease-in-out infinite;
-}
-@keyframes ls-pulse {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.8; }
-}
-.ls-road {
-  position: absolute;
-  left: 30%;
-  bottom: 14%;
-  width: 34%;
-  height: 3px;
-  transform: rotate(6deg);
-  mix-blend-mode: screen;
-  filter: blur(1px);
-  background: linear-gradient(90deg, transparent, rgba(247, 183, 51, 0.6), transparent);
-  animation: ls-road 3.6s linear infinite;
-}
-@keyframes ls-road {
-  0% { transform: rotate(6deg) translateX(-40%); opacity: 0; }
-  25% { opacity: 0.7; }
-  100% { transform: rotate(6deg) translateX(60%); opacity: 0; }
+@keyframes ls-meteor {
+  0%, 72% { opacity: 0; transform: translate(0, 0) rotate(22deg); }
+  76% { opacity: 1; }
+  88% { opacity: 0; transform: translate(-180px, 70px) rotate(22deg); }
+  100% { opacity: 0; }
 }
 
 .ls-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(7, 13, 21, 0.2) 0%, transparent 30%, rgba(7, 13, 21, 0.4) 100%);
+  background: linear-gradient(180deg, rgba(7, 13, 21, 0.18) 0%, transparent 30%, rgba(7, 13, 21, 0.4) 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ls-photo, .ls-stars, .ls-beam, .ls-water, .ls-truck, .ls-road {
+  .ls-photo, .ls-stars, .ls-beam, .ls-water, .ls-trail, .ls-truck, .ls-meteor {
     animation: none !important;
   }
 }
 
-/* ---- Form panel: dimmed scene on mobile, solid with a gold edge on desktop ---- */
+/* ---- Form panel: dimmed scene on mobile, solid with a glowing gold edge on desktop ---- */
 .ls-form-panel {
   background:
     linear-gradient(rgba(7, 13, 21, 0.88), rgba(7, 13, 21, 0.93)),
@@ -132,8 +159,9 @@
 }
 @media (min-width: 768px) {
   .ls-form-panel {
-    background: #0a111a;
+    background: linear-gradient(105deg, #0c141f 0%, #0a111a 60%);
     backdrop-filter: none;
+    box-shadow: inset 28px 0 70px -50px rgba(247, 183, 51, 0.4);
   }
   .ls-form-panel::before {
     content: "";
@@ -143,6 +171,7 @@
     left: -1px;
     width: 2px;
     transform: skewX(-5deg);
-    background: linear-gradient(180deg, transparent, rgba(247, 183, 51, 0.6) 25%, rgba(247, 183, 51, 0.6) 75%, transparent);
+    background: linear-gradient(180deg, transparent, rgba(247, 183, 51, 0.75) 25%, rgba(247, 183, 51, 0.75) 75%, transparent);
+    box-shadow: 0 0 22px rgba(247, 183, 51, 0.55);
   }
 }
