@@ -1,9 +1,13 @@
 /* ============================================================================
    Login cinemagraph — clearly visible animated light layers over the cropped
-   Air Ocean Line hero scene (public/images/login-scene.png): ken-burns drift,
-   twinkling stars, a sweeping lighthouse beam, shimmering water, light trails
-   running up the coastal road, and an occasional shooting star.
-   Reduced-motion safe.
+   Air Ocean Line hero scene (public/images/login-scene.png). Everything except
+   the scrim lives inside .ls-pan, which adds a slow horizontal "sailing" camera
+   pan on top of the photo's ken-burns so the whole scene glides together and
+   the overlays stay aligned. Layers: twinkling stars, a wide sweeping
+   lighthouse beam + flickering lamp, shimmering water with a vertical bob and a
+   drifting specular glint, foam at the ship's bow, light trails + a travelling
+   headlight glow running up the coastal road (truck body stays put), a truck
+   headlight pulse and an occasional shooting star. Reduced-motion safe.
    ========================================================================== */
 
 .ls-scene {
@@ -13,12 +17,28 @@
   background: #0a1422;
 }
 
+/* slow horizontal camera pan over the whole scene — the "sailing" drift.
+   A fixed 1.06 zoom gives overscan so the edges never show while it pans, and
+   because every light layer lives inside here they glide with the photo and
+   stay aligned to it. */
+.ls-pan {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  animation: ls-pan 46s ease-in-out infinite alternate;
+}
+@keyframes ls-pan {
+  from { transform: scale(1.06) translate3d(-1.3%, 0, 0); }
+  to { transform: scale(1.06) translate3d(1.3%, 0, 0); }
+}
+
 /* hero photo + ken-burns */
 .ls-photo {
   position: absolute;
   inset: -4%;
   background: url("/images/login-scene.png") center center / cover no-repeat;
-  animation: ls-kenburns 24s ease-in-out infinite alternate;
+  will-change: transform;
+  animation: ls-kenburns 26s ease-in-out infinite alternate;
 }
 @keyframes ls-kenburns {
   from { transform: scale(1) translate(0, 0); }
@@ -44,25 +64,46 @@
   50% { opacity: 0.95; }
 }
 
-/* lighthouse beam sweep */
+/* lighthouse beam sweep — wide, bright, clearly visible */
 .ls-beam {
   position: absolute;
-  left: 9%;
-  top: 24%;
-  width: 50%;
-  height: 11%;
+  left: 8%;
+  top: 22.5%;
+  width: 56%;
+  height: 13%;
   transform-origin: 0% 50%;
   mix-blend-mode: screen;
-  filter: blur(7px);
-  background: linear-gradient(90deg, rgba(255, 236, 175, 0.55), rgba(255, 236, 175, 0.08) 55%, transparent 80%);
-  animation: ls-beam 7s ease-in-out infinite;
+  filter: blur(6px);
+  background: linear-gradient(90deg, rgba(255, 240, 185, 0.82), rgba(255, 236, 175, 0.2) 50%, transparent 82%);
+  animation: ls-beam 8s ease-in-out infinite;
 }
 @keyframes ls-beam {
-  0%, 100% { transform: rotate(-7deg); opacity: 0.3; }
-  50% { transform: rotate(6deg); opacity: 0.7; }
+  0%, 100% { transform: rotate(-13deg); opacity: 0.4; }
+  50% { transform: rotate(11deg); opacity: 0.95; }
 }
 
-/* water shimmer */
+/* lighthouse lamp glow at the beam's source — gentle flicker */
+.ls-lamp {
+  position: absolute;
+  left: 7%;
+  top: 22%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background: radial-gradient(closest-side, rgba(255, 244, 200, 0.95), rgba(255, 226, 150, 0.4) 45%, transparent 72%);
+  animation: ls-lamp 3.4s ease-in-out infinite;
+}
+@keyframes ls-lamp {
+  0%, 100% { opacity: 0.45; }
+  18% { opacity: 0.92; }
+  42% { opacity: 0.6; }
+  52% { opacity: 1; }
+  74% { opacity: 0.65; }
+}
+
+/* water shimmer — stronger ripple + brighter glints, with a gentle vertical bob */
 .ls-water {
   position: absolute;
   left: 0;
@@ -70,15 +111,55 @@
   top: 62%;
   bottom: 5%;
   mix-blend-mode: screen;
-  opacity: 0.7;
+  opacity: 0.88;
   background:
-    repeating-linear-gradient(93deg, rgba(247, 183, 51, 0) 0 11px, rgba(247, 183, 51, 0.09) 12px, rgba(247, 183, 51, 0) 18px),
-    repeating-linear-gradient(87deg, rgba(255, 255, 255, 0) 0 15px, rgba(255, 255, 255, 0.07) 16px, rgba(255, 255, 255, 0) 24px);
-  animation: ls-water 7s linear infinite;
+    repeating-linear-gradient(93deg, rgba(247, 183, 51, 0) 0 10px, rgba(247, 183, 51, 0.16) 12px, rgba(247, 183, 51, 0) 18px),
+    repeating-linear-gradient(87deg, rgba(255, 255, 255, 0) 0 14px, rgba(255, 255, 255, 0.12) 16px, rgba(255, 255, 255, 0) 24px);
+  animation: ls-water 6s linear infinite, ls-water-bob 5s ease-in-out infinite;
 }
 @keyframes ls-water {
   from { background-position: 0 0, 0 0; }
-  to { background-position: 140px 0, -100px 0; }
+  to { background-position: 160px 0, -120px 0; }
+}
+@keyframes ls-water-bob {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(0.7%) scaleY(1.05); }
+}
+
+/* drifting specular glint sweeping across the water surface */
+.ls-water-spec {
+  position: absolute;
+  left: 0;
+  right: 26%;
+  top: 58%;
+  bottom: 6%;
+  mix-blend-mode: screen;
+  filter: blur(3px);
+  background: radial-gradient(42% 60% at 32% 42%, rgba(255, 238, 188, 0.28), transparent 70%);
+  animation: ls-spec 9s ease-in-out infinite;
+}
+@keyframes ls-spec {
+  0% { transform: translateX(-10%); opacity: 0.18; }
+  50% { opacity: 0.6; }
+  100% { transform: translateX(16%); opacity: 0.18; }
+}
+
+/* foam lapping the ship's bow (lower-left of the vessel) */
+.ls-foam {
+  position: absolute;
+  left: 18%;
+  top: 51%;
+  width: 13%;
+  height: 5%;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  filter: blur(4px);
+  background: radial-gradient(60% 80% at 50% 50%, rgba(255, 255, 255, 0.6), rgba(214, 236, 255, 0.22) 55%, transparent 76%);
+  animation: ls-foam 4.4s ease-in-out infinite;
+}
+@keyframes ls-foam {
+  0%, 100% { opacity: 0.32; transform: translateX(0) scaleX(1); }
+  50% { opacity: 0.72; transform: translateX(-1.4%) scaleX(1.14); }
 }
 
 /* light trails running up the coastal road (lower-centre) */
@@ -86,21 +167,21 @@
   position: absolute;
   left: 42%;
   bottom: 7%;
-  width: 64px;
+  width: 70px;
   height: 4px;
   border-radius: 4px;
   mix-blend-mode: screen;
   filter: blur(1px);
-  background: linear-gradient(90deg, transparent, rgba(255, 214, 130, 0.95), transparent);
-  animation: ls-trail 2.8s linear infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 220, 140, 1), transparent);
+  animation: ls-trail 2.5s linear infinite;
 }
 @keyframes ls-trail {
   0% { transform: translate(0, 0) rotate(-50deg) scaleX(0.5); opacity: 0; }
   18% { opacity: 1; }
-  100% { transform: translate(150px, -150px) rotate(-50deg) scaleX(1.1); opacity: 0; }
+  100% { transform: translate(155px, -155px) rotate(-50deg) scaleX(1.15); opacity: 0; }
 }
 
-/* truck headlight pulse */
+/* truck headlight pulse (the truck body stays put — only the light breathes) */
 .ls-truck {
   position: absolute;
   left: 39%;
@@ -114,6 +195,27 @@
 @keyframes ls-pulse {
   0%, 100% { opacity: 0.35; }
   50% { opacity: 0.85; }
+}
+
+/* a warm headlight glow running up the road — reads as the truck moving,
+   while the truck body itself (baked into the photo) stays put */
+.ls-headlight {
+  position: absolute;
+  left: 40%;
+  bottom: 6%;
+  width: 96px;
+  height: 44px;
+  margin: -22px 0 0 -48px;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  filter: blur(5px);
+  background: radial-gradient(closest-side, rgba(255, 226, 150, 0.72), transparent 72%);
+  animation: ls-headlight 3.8s ease-in-out infinite;
+}
+@keyframes ls-headlight {
+  0% { transform: translate(0, 0) scale(0.7); opacity: 0; }
+  16% { opacity: 0.9; }
+  100% { transform: translate(140px, -140px) scale(1.12); opacity: 0; }
 }
 
 /* occasional shooting star */
@@ -145,7 +247,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ls-photo, .ls-stars, .ls-beam, .ls-water, .ls-trail, .ls-truck, .ls-meteor {
+  .ls-pan, .ls-photo, .ls-stars, .ls-beam, .ls-lamp, .ls-water, .ls-water-spec,
+  .ls-foam, .ls-trail, .ls-truck, .ls-headlight, .ls-meteor {
     animation: none !important;
   }
 }
