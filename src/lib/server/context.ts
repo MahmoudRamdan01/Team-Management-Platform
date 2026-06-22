@@ -54,9 +54,13 @@ export async function requireUser(): Promise<ServerContext & { profile: Profile 
   return ctx as ServerContext & { profile: Profile };
 }
 
-/** Require a specific permission, else redirect to the dashboard. */
+/**
+ * Require a specific permission, else redirect to the gate-free landing page.
+ * (Redirecting to /dashboard here would loop for users without DASHBOARD_VIEW,
+ * since the dashboard itself requires that permission.)
+ */
 export async function requirePermission(permission: PermissionKey) {
   const ctx = await requireUser();
-  if (!ctx.permissions.has(permission)) redirect("/dashboard");
+  if (!ctx.permissions.has(permission)) redirect("/home");
   return ctx;
 }

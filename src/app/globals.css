@@ -30,6 +30,7 @@
     font-weight: 400;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   ::selection {
     background: var(--gold);
@@ -37,6 +38,7 @@
   }
   ::-webkit-scrollbar {
     width: 10px;
+    height: 10px;
   }
   ::-webkit-scrollbar-track {
     background: var(--ink);
@@ -46,6 +48,9 @@
     border-radius: 8px;
     border: 2px solid var(--ink);
   }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2c3e50;
+  }
   :focus-visible {
     outline: 2px solid var(--gold);
     outline-offset: 3px;
@@ -54,23 +59,83 @@
 }
 
 @layer components {
+  /* Surfaces ---------------------------------------------------------- */
   .card {
-    @apply rounded-brand border border-white/10 bg-gradient-to-br from-panel2 to-panel;
+    @apply rounded-brand border border-white/10 bg-gradient-to-b from-panel2 to-panel;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 18px 40px -24px rgba(0, 0, 0, 0.7);
   }
+  .card-hover {
+    @apply transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-white/20;
+  }
+  .card-hover:hover {
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 28px 52px -26px rgba(0, 0, 0, 0.78);
+  }
+  .surface {
+    @apply rounded-2xl border border-white/[0.07] bg-white/[0.025];
+  }
+
+  /* Pills / badges ---------------------------------------------------- */
   .pill {
     @apply inline-flex items-center gap-2 rounded-full px-3 py-1 font-mono text-[0.62rem] tracking-widest;
   }
+
+  /* Buttons ----------------------------------------------------------- */
   .btn-gold {
-    @apply rounded-2xl bg-gradient-to-br from-[#FFD069] via-gold to-[#e9a41c] px-6 py-3 font-bold text-gold-ink transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-gold/20 active:scale-95;
+    @apply rounded-2xl bg-gradient-to-b from-[#FFD877] via-gold to-[#e09c14] px-6 py-3 font-bold text-gold-ink transition-all duration-300 ease-out active:scale-[0.97];
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      0 8px 20px -8px rgba(247, 183, 51, 0.5);
+  }
+  .btn-gold:hover {
+    @apply -translate-y-0.5;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      0 14px 28px -8px rgba(247, 183, 51, 0.6);
+  }
+  .btn-gold:disabled {
+    @apply pointer-events-none opacity-60;
   }
   .btn-ghost {
-    @apply rounded-full border border-white/20 bg-white/5 px-6 py-3 font-medium text-foam transition hover:border-gold;
+    @apply rounded-full border border-white/15 bg-white/5 px-6 py-3 font-medium text-foam transition-all duration-300 ease-out hover:border-gold/60 hover:bg-white/[0.08] hover:text-white;
   }
+
+  /* Form controls ----------------------------------------------------- */
   .input {
-    @apply w-full rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-foam outline-none transition-all duration-300 focus:border-gold/50 focus:bg-white/[0.08] placeholder:text-mist/30;
+    @apply w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-foam outline-none transition-all duration-300 placeholder:text-mist/30 focus:border-gold/60 focus:bg-white/[0.07];
+  }
+  .input:focus {
+    box-shadow: 0 0 0 4px rgba(247, 183, 51, 0.12);
   }
   .label {
-    @apply mb-1.5 block text-xs font-semibold text-[#B9C6D2];
+    @apply mb-1.5 block text-xs font-semibold tracking-wide text-[#B9C6D2];
+  }
+
+  /* Typography helpers ------------------------------------------------ */
+  .section-title {
+    @apply font-brand text-xl font-bold tracking-tight text-white sm:text-2xl;
+  }
+  .title-accent {
+    @apply h-7 w-1.5 shrink-0 rounded-full bg-gold;
+    box-shadow: 0 0 15px rgba(247, 183, 51, 0.5);
+  }
+}
+
+@layer utilities {
+  .hover-lift {
+    @apply transition-transform duration-300 ease-out hover:-translate-y-0.5;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 

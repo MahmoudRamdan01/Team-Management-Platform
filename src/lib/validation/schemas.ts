@@ -27,6 +27,11 @@ export const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+export const forgotPasswordSchema = z.object({
+  // username or full email — same normalisation as login
+  email: z.string().trim().min(1).max(120),
+});
+
 export const registerSchema = z
   .object({
     fullName: z.string().trim().min(2).max(80),

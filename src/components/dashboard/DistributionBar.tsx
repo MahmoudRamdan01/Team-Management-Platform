@@ -6,10 +6,12 @@ export function DistributionBar({
   title,
   data,
   colorMap,
+  emptyLabel = "No data available yet",
 }: {
   title: string;
   data: { label: string; value: number; color?: string }[];
   colorMap?: Record<string, string>;
+  emptyLabel?: string;
 }) {
   const total = data.reduce((s, d) => s + d.value, 0) || 1;
   return (
@@ -48,7 +50,7 @@ export function DistributionBar({
         })}
         {data.length === 0 && (
           <div className="flex flex-col items-center justify-center py-10 text-mist/30 italic">
-            <p className="text-sm">لا توجد بيانات متاحة حالياً</p>
+            <p className="text-sm">{emptyLabel}</p>
           </div>
         )}
       </div>
